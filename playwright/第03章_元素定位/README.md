@@ -1,4 +1,4 @@
-# 第三章：元素定位
+# 第三章：元素定位(Locator)
 
 元素定位是網頁自動化的核心技能。本章將學習多種定位元素的方法。
 
@@ -42,13 +42,13 @@ page.click("form#login button.submit")
 
 | 選擇器 | 說明 | 範例 |
 |--------|------|------|
-| `element` | 標籤名稱 | `button`, `input` |
-| `#id` | ID 選擇器 | `#submit` |
-| `.class` | 類別選擇器 | `.btn-primary` |
-| `[attr]` | 屬性選擇器 | `[type='submit']` |
-| `parent > child` | 直接子元素 | `form > button` |
-| `ancestor descendant` | 後代元素 | `div button` |
-| `element:nth-child(n)` | 第 n 個子元素 | `li:nth-child(2)` |
+| `element` | 標籤名稱(tag selector) | `button`, `input` |
+| `#id` | ID 選擇器(id selector) | `#submit` |
+| `.class` | 類別選擇器(class selector) | `.btn-primary` |
+| `[attr]` | 屬性選擇器(attribute Selector) | `[type='submit']` |
+| `parent > child` | 直接子元素(child selector) | `form > button` |
+| `ancestor descendant` | 後代元素(descendant selector) | `div button` |
+| `element:nth-child(n)` | 第 n 個子元素(nth-child selector) | `li:nth-child(2)` |
 
 ---
 
