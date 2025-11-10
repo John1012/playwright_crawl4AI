@@ -2,6 +2,21 @@
 
 元素定位是網頁自動化的核心技能。本章將學習多種定位元素的方法。
 
+## 📁 本章檔案
+
+- **`index.py`** - 元素定位示範程式（建議先執行這個）
+- **`login_demo.html`** - 練習用的登入頁面
+- **`README.md`** - 本章教學文件
+
+## 🚀 快速開始
+
+```bash
+# 執行示範程式
+python index.py
+```
+
+程式會自動開啟 `login_demo.html` 並展示四種不同的元素定位方法。
+
 ## 3.1 CSS 選擇器
 
 ### 基本 CSS 選擇器語法
@@ -167,43 +182,100 @@ page.locator("div.container").locator("button.submit").click()
 
 ## 完整範例
 
+### 執行 index.py
+
+本章提供了完整的示範程式 `index.py`，展示四種元素定位方法：
+
+```bash
+python index.py
+```
+
+**執行結果：**
+```
+============================================================
+Playwright 元素定位示範
+============================================================
+✓ 已開啟登入頁面
+
+使用 get_by_label() 定位輸入欄位...
+✓ 已填入用戶名：admin
+✓ 已填入密碼：password
+
+使用 get_by_role() 定位按鈕...
+✓ 已點擊登入按鈕
+
+✓ 登入成功！
+
+程式執行完成，3 秒後關閉瀏覽器...
+
+============================================================
+示範完成！
+============================================================
+```
+
+### 程式碼說明
+
+`index.py` 的核心程式碼：
+
 ```python
 from playwright.sync_api import sync_playwright
+import os
 
 def element_location_demo():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
         page = browser.new_page()
         
-        page.goto("https://example.com/login")
+        # 開啟本地 HTML 檔案
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        html_file = os.path.join(current_dir, "login_demo.html")
+        page.goto(f"file://{html_file}")
         
-        # 方法1：使用 get_by_label()
+        # 方法1：使用 get_by_label() - 根據 label 文字定位
         page.get_by_label("用戶名").fill("admin")
         page.get_by_label("密碼").fill("password")
         
-        # 方法2：使用 get_by_role()
+        # 方法2：使用 get_by_role() - 根據元素角色定位
         page.get_by_role("button", name="登入").click()
         
-        # 方法3：使用 CSS 選擇器
-        # page.click("#login-button")
+        # 方法3：使用 CSS 選擇器（已註解）
+        # page.locator("#username").fill("admin")
+        # page.locator("#password").fill("password")
+        # page.locator("#login-button").click()
         
-        # 方法4：使用 XPath
-        # page.click("xpath=//button[text()='登入']")
+        # 方法4：使用 XPath（已註解）
+        # page.locator("xpath=//input[@id='username']").fill("admin")
+        # page.locator("xpath=//input[@id='password']").fill("password")
+        # page.locator("xpath=//button[text()='登入']").click()
         
+        page.wait_for_timeout(3000)
         browser.close()
-
-if __name__ == "__main__":
-    element_location_demo()
 ```
+
+### login_demo.html 說明
+
+這是一個完整的登入頁面，包含：
+- 用戶名輸入框（帶有 `<label>` 標籤）
+- 密碼輸入框（帶有 `<label>` 標籤）
+- 登入按鈕（帶有 `role="button"` 屬性）
+- 登入成功的動畫提示
+- 測試帳號資訊提示
+
+**測試帳號：**
+- 用戶名：`admin`
+- 密碼：`password`
+
+你可以直接在瀏覽器中開啟 `login_demo.html` 查看頁面效果。
 
 ---
 
 ## 練習題
 
-1. 使用 3 種不同方法定位同一個按鈕
-2. 嘗試所有內建定位器（get_by_*）
-3. 練習組合定位器的使用
-4. 使用開發者工具查看元素，練習寫 CSS 選擇器
+1. **修改 index.py**：取消註解其他定位方法（CSS 選擇器、XPath），測試不同的定位方式
+2. **使用 3 種不同方法**定位 `login_demo.html` 中的登入按鈕
+3. **嘗試所有內建定位器**（get_by_*）在 `login_demo.html` 上
+4. **開啟開發者工具**（F12）查看 `login_demo.html` 的元素結構，練習寫 CSS 選擇器
+5. **修改 login_demo.html**：加入更多表單元素（如：Email、電話），並用 Playwright 操作它們
 
 ---
 

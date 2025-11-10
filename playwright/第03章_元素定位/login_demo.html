@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登入頁面 - 元素定位示範</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .success-message {
+            display: none;
+            background: #4caf50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 20px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .info-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .info-box h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .info-box p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>🔐 登入系統</h1>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">用戶名</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    placeholder="請輸入用戶名"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密碼</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="請輸入密碼"
+                    required
+                >
+            </div>
+            
+            <button type="submit" id="login-button" role="button">登入</button>
+        </form>
+        
+        <div class="success-message" id="success-message">
+            ✓ 登入成功！歡迎回來，<span id="welcome-user"></span>
+        </div>
+        
+        <div class="info-box">
+            <h3>📝 測試資訊</h3>
+            <p><strong>用戶名：</strong>admin</p>
+            <p><strong>密碼：</strong>password</p>
+            <p style="margin-top: 10px; color: #999;">
+                此頁面用於 Playwright 元素定位練習
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // 模擬登入驗證
+            if (username === 'admin' && password === 'password') {
+                document.getElementById('welcome-user').textContent = username;
+                document.getElementById('success-message').classList.add('show');
+                
+                // 3 秒後隱藏成功訊息
+                setTimeout(() => {
+                    document.getElementById('success-message').classList.remove('show');
+                    document.getElementById('login-form').reset();
+                }, 3000);
+            } else {
+                alert('❌ 用戶名或密碼錯誤！\n\n請使用：\n用戶名：admin\n密碼：password');
+            }
+        });
+    </script>
+</body>
+</html>
