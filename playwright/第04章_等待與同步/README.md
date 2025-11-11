@@ -147,41 +147,56 @@ page.wait_for_function("count => document.querySelectorAll('.item').length >= co
 
 ## 完整範例
 
+本章提供了完整的互動式示範：
+
+### 檔案說明
+- `waiting_demo.html` - 互動式示範頁面，包含 6 種等待情境
+- `index.py` - 完整的 Python 腳本，展示所有等待策略
+
+### 執行方式
+
+```bash
+# 在本章目錄下執行
+python index.py
+```
+
+### 示範內容
+
+1. **延遲載入元素** - 等待元素在延遲後出現
+2. **動態內容載入** - 模擬 AJAX 請求與資料載入
+3. **元素狀態變化** - 等待元素從隱藏變為可見
+4. **表單提交** - 處理表單提交與回應等待
+5. **批次載入** - 等待多個元素逐步載入
+6. **API 請求** - 模擬 API 請求與回應處理
+7. **頁面載入狀態** - 觀察不同的載入狀態
+8. **超時設定** - 自訂超時時間的使用
+
+### 核心程式碼片段
+
 ```python
 from playwright.sync_api import sync_playwright
 
-def waiting_example():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
-        page = browser.new_page()
-        
-        # 設定超時時間
-        page.set_default_timeout(30000)
-        
-        # 訪問網站
-        page.goto("https://example.com")
-        
-        # 等待頁面完全載入
-        page.wait_for_load_state("networkidle")
-        
-        # 等待特定元素出現
-        page.wait_for_selector("#content", state="visible")
-        
-        # 點擊按鈕並等待導航
-        with page.expect_navigation():
-            page.click("button#submit")
-        
-        # 等待 API 回應
-        with page.expect_response("**/api/data") as response_info:
-            page.click("button#load-data")
-        
-        response = response_info.value
-        print(f"API 狀態碼: {response.status}")
-        
-        browser.close()
+# 等待延遲元素
+page.click("#trigger-delayed")
+page.wait_for_selector("#loading-1", state="visible")
+page.wait_for_selector("#loading-1", state="hidden")
+page.wait_for_selector("#delayed-result.show", state="visible")
 
-if __name__ == "__main__":
-    waiting_example()
+# 等待動態內容
+page.click("#load-data")
+page.wait_for_function(
+    "document.querySelectorAll('#dynamic-content .item').length >= 3"
+)
+
+# 等待元素狀態變化
+page.click("#toggle-visibility")
+page.wait_for_selector("#toggle-element", state="visible")
+
+# 等待頁面載入狀態
+page.goto("file://path/to/waiting_demo.html")
+page.wait_for_load_state("domcontentloaded")
+page.wait_for_load_state("load")
+page.wait_for_load_state("networkidle")
 ```
 
 ---
