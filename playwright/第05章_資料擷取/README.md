@@ -221,16 +221,45 @@ if __name__ == "__main__":
 
 ## 完整範例：爬取新聞標題
 
+### 本地測試檔案
+
+本章提供完整的本地測試環境：
+
+- `news_sample.html` - 新聞網站範例頁面
+- `scrape_news.py` - 新聞爬蟲程式
+
+### 執行方式
+
+```bash
+# 進入第05章目錄
+cd playwright/第05章_資料擷取
+
+# 執行爬蟲程式
+python scrape_news.py
+```
+
+### 程式碼說明
+
 ```python
 from playwright.sync_api import sync_playwright
 import csv
+import json
+from pathlib import Path
 
 def scrape_news():
+    """爬取本地新聞網站範例"""
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
         page = browser.new_page()
         
-        page.goto("https://news.example.com")
+        # 取得當前檔案的絕對路徑
+        current_dir = Path(__file__).parent
+        html_file = current_dir / "news_sample.html"
+        
+        # 訪問本地 HTML 檔案
+        page.goto(f"file://{html_file.absolute()}")
+        
+        # 等待新聞項目載入
         page.wait_for_selector("article.news-item")
         
         news_list = []
@@ -241,22 +270,44 @@ def scrape_news():
                 "title": article.locator("h2").inner_text(),
                 "summary": article.locator("p.summary").inner_text(),
                 "time": article.locator("time").inner_text(),
+                "category": article.locator(".category").inner_text(),
                 "link": article.locator("a").get_attribute("href")
             }
             news_list.append(news)
         
         # 儲存為 CSV
-        with open("news.csv", "w", encoding="utf-8", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=["title", "summary", "time", "link"])
+        csv_file = current_dir / "news.csv"
+        with open(csv_file, "w", encoding="utf-8", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=["title", "summary", "time", "category", "link"])
             writer.writeheader()
             writer.writerows(news_list)
         
-        print(f"擷取 {len(news_list)} 則新聞")
+        # 儲存為 JSON
+        json_file = current_dir / "news.json"
+        with open(json_file, "w", encoding="utf-8") as f:
+            json.dump(news_list, f, ensure_ascii=False, indent=2)
+        
+        print(f"總共成功擷取 {len(news_list)} 則新聞")
         browser.close()
 
 if __name__ == "__main__":
     scrape_news()
 ```
+
+### 執行結果
+
+程式會產生兩個檔案：
+
+1. `news.csv` - CSV 格式的新聞資料
+2. `news.json` - JSON 格式的新聞資料
+
+### 學習重點
+
+- 使用 `Path` 處理檔案路徑
+- 爬取本地 HTML 檔案進行測試
+- 同時輸出 CSV 和 JSON 兩種格式
+- 處理多個元素的資料擷取
+- 錯誤處理與資料驗證
 
 ---
 
