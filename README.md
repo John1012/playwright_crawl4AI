@@ -18,7 +18,7 @@
 
 ### 傳統爬蟲的困境
 
-- ❌ **JavaScript 渲染的內容抓不到**：現在很多網站用 React、Vue 這些框架，資料都是靠 JavaScript 動態載入的
+- ❌ **JavaScript 產生的內容抓不到**：現在很多網站用 React、Vue 這些框架，資料都是靠 JavaScript 動態載入的
 
 - ❌ **反爬蟲機制越來越強**：User-Agent 檢查、Cookie 追蹤、行為分析...隨便一個擋住你就爬不動了
 - ❌ **等待時間很難控制**：頁面載入有快有慢，要用 `time.sleep()` 猜時間，不然就漏資料
