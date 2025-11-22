@@ -104,42 +104,81 @@ page.wait_for_selector("#element")
 
 ### 等待導航完成
 
+### 等待導航完成
+
+當使用 `page.click()` 觸發頁面跳轉時，必須等待新頁面載入完成才能繼續操作。
+
+**為什麼需要 `expect_navigation`？**
+如果只寫 `page.click()`，Playwright 點擊後會立即執行下一行程式碼。如果下一行是要操作新頁面的元素，但新頁面還沒載入好，就會報錯。
+
+**為什麼要使用 `with` 語法？**
+這是為了避免「競爭條件」(Race Condition)。
+- **錯誤寫法**：先點擊，再等待。
+  ```python
+  page.click("button")
+  page.wait_for_navigation() # 如果導航發生得太快，可能在開始等待前就已經完成了，導致這裡無限等待。
+  ```
+- **正確寫法**：使用 `with` 確保在點擊**之前**就開始監聽導航事件。
+  ```python
+  # 正確：先建立監聽器，再執行動作
+  with page.expect_navigation():
+      page.click("a#next-page")
+  ```
+
 ```python
-# 方法1：使用 expect_navigation
+# 方法1：基本用法 - 等待導航完成（預設等待 load 事件）
 with page.expect_navigation():
     page.click("a#next-page")
 
-# 方法2：等待特定 URL
+# 方法2：等待特定 URL - 確保跳轉到正確頁面
 with page.expect_navigation(url="**/success"):
     page.click("button#submit")
 ```
 
 ### 等待請求/回應
 
+在處理現代網頁（尤其是 Single Page Application, SPA）時，很多操作不會觸發頁面跳轉，而是發送 AJAX/API 請求。這時我們需要等待特定的網路請求完成。
+
+同樣需要使用 `with` 語法來避免競爭條件：
+
 ```python
-# 等待特定請求
+# 等待特定請求發出
+# 應用場景：確認點擊按鈕後，前端有正確發送 API 請求
 with page.expect_request("**/api/data") as request_info:
     page.click("button#load-data")
 request = request_info.value
-print(request.url)
+print(f"請求 URL: {request.url}")
+print(f"請求方法: {request.method}")
 
-# 等待特定回應
+# 等待特定回應回來
+# 應用場景：確認資料已從伺服器返回，通常接續著會更新 UI
 with page.expect_response("**/api/user") as response_info:
     page.click("button#get-user")
 response = response_info.value
-print(response.status)
+print(f"回應狀態: {response.status}")
+print(f"回應內容: {response.json()}")
 ```
 
 ### 自訂等待條件
 
+當內建的等待方法（如等待元素可見、等待網路閒置）都無法滿足需求時，可以使用 `wait_for_function` 來執行自訂的 JavaScript 判斷邏輯。Playwright 會不斷執行這段 JS，直到回傳 `true` 為止。
+
+**適用場景：**
+- 等待某個全域變數的值改變
+- 等待複雜的 DOM 結構變化（例如列表長度大於 N）
+- 等待 Canvas 或動畫完成
+
 ```python
-# 使用 wait_for_function
+# 範例 1：等待全域變數狀態
+# 等待網頁中的 document.readyState 變為 'complete'
 page.wait_for_function("document.readyState === 'complete'")
 
-# 等待特定條件
+# 範例 2：等待 DOM 數量變化
+# 等待直到頁面上 class 為 .item 的元素超過 10 個
 page.wait_for_function("() => document.querySelectorAll('.item').length > 10")
 
-# 傳遞參數
+# 範例 3：傳遞參數到瀏覽器環境
+# 將 Python 變數 count (5) 傳遞給 JavaScript 函數
 page.wait_for_function("count => document.querySelectorAll('.item').length >= count", 5)
 ```
 
