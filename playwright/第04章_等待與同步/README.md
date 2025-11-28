@@ -104,7 +104,9 @@ page.wait_for_selector("#element")
 
 ### 等待導航完成
 
-[說明什麼是導航？](./pageexpect-navigation.md)
+[詳細說明什麼是導航？](./pageexpect-navigation.md)
+
+[詳細說明 `with` 與 `with ... as ...` 的差別](./with說明.md)
 
 當使用 `page.click()` 觸發頁面跳轉時，必須等待新頁面載入完成才能繼續操作。
 
