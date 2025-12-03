@@ -44,6 +44,7 @@ if __name__ == '__main__':
 Crawl4AI 的爬蟲可以透過兩個主要類別進行高度客製化：
 
 1. BrowserConfig：控制瀏覽器的行為（無頭模式或完整使用者介面、使用者代理、JavaScript 開關等）。
+
 2. Crawler RunConfig：控制每個爬蟲如何運作（快取caching、提取extraction、逾時timeout、掛接hooking等）。
 
 [**簡單配置.ipynb**](./lesson2_基本配置.ipynb)
@@ -55,7 +56,14 @@ from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig, CacheMode
 async def main():
     browser_conf= BrowserConfig(headless=True)
     run_conf = CrawlerRunConfig(
-        cache_mode=CacheMode.BYPASS #說明1
+        # cache_mode: 設定爬蟲的快取模式
+        # CacheMode.BYPASS: 繞過快取,每次都重新抓取網頁內容,不使用任何已儲存的快取資料
+        # 其他可用模式:
+        #   - CacheMode.ENABLED: 啟用快取,如果快取存在則使用快取資料,避免重複請求
+        #   - CacheMode.READ_ONLY: 只讀模式,只從快取讀取,不會更新快取
+        #   - CacheMode.WRITE_ONLY: 只寫模式,只更新快取,不從快取讀取
+        # 使用 BYPASS 適合:測試階段、需要最新資料、網頁內容經常變動的情況
+        cache_mode=CacheMode.BYPASS
     )
 
     async with AsyncWebCrawler(config=browser_conf) as crawler:
@@ -87,7 +95,12 @@ from crawl4ai.content_filter_strategy import PruningContentFilter
 from crawl4ai.markdown_generation_strategy import DefaultMarkdownGenerator
 
 md_generator = DefaultMarkdownGenerator(
-    content_filter = PruningContentFilter(threshold=0.4, threshold_type="fixed") #說明1
+    # 建立 PruningContentFilter 內容過濾器,用於過濾低品質或不重要的內容
+    # threshold=0.4: 設定過濾閾值為 0.4,內容重要性分數低於此值的內容將被移除
+    # threshold_type="fixed": 使用固定閾值模式,所有內容都使用相同的 0.4 標準來判斷是否保留
+    # 其他可選的 threshold_type 包括: "dynamic"(動態閾值)、"percentile"(百分位數)
+    # 此過濾器會分析 HTML 元素的密度、文字長度、標籤類型等特徵來計算重要性分數
+    content_filter = PruningContentFilter(threshold=0.4, threshold_type="fixed")
 )
 
 config = CrawlerRunConfig(
