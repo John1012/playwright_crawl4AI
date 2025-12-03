@@ -7,16 +7,21 @@
   - [漫畫圖解:同步 vs 非同步](#漫畫圖解同步-vs-非同步)
   - [左圖:同步 (Sync) 🐢](#左圖同步-sync-)
   - [右圖:非同步 (Async) ⚡](#右圖非同步-async-)
-- [2. 環境篇:如何在 Jupyter Notebook 執行？](#2-環境篇如何在-jupyter-notebook-執行)
+- [2. 實戰比較:有 asyncio vs 沒有 asyncio](#2-實戰比較有-asyncio-vs-沒有-asyncio)
+  - [情境:下載 3 個檔案](#情境下載-3-個檔案)
+  - [方法 1:傳統同步寫法 (沒有 asyncio)](#方法-1傳統同步寫法-沒有-asyncio)
+  - [方法 2:使用 asyncio 非同步寫法](#方法-2使用-asyncio-非同步寫法)
+  - [效能比較](#效能比較)
+- [3. 環境篇:如何在 Jupyter Notebook 執行？](#3-環境篇如何在-jupyter-notebook-執行)
   - [❌ 錯誤寫法 (在 .ipynb 中)](#-錯誤寫法-在-ipynb-中)
   - [✅ 正確解法 1:直接 `await` (推薦)](#-正確解法-1直接-await-推薦)
   - [✅ 正確解法 2:使用 `nest_asyncio` (萬用解)](#-正確解法-2使用-nest_asyncio-萬用解)
-- [3. 基礎篇:語法三部曲](#3-基礎篇語法三部曲)
+- [4. 基礎篇:語法三部曲](#4-基礎篇語法三部曲)
   - [第一步:定義 (`async def`) 與 執行 (`await`)](#第一步定義-async-def-與-執行-await)
   - [第二步:循序執行 (Sequential) - 還沒變快？](#第二步循序執行-sequential---還沒變快)
   - [第三步:並行執行 (Concurrent) - 真正的加速！🚀](#第三步並行執行-concurrent---真正的加速)
-- [4. 實戰篇:模擬高效率爬蟲](#4-實戰篇模擬高效率爬蟲)
-- [5. 重點總結](#5-重點總結)
+- [5. 實戰篇:模擬高效率爬蟲](#5-實戰篇模擬高效率爬蟲)
+- [6. 重點總結](#6-重點總結)
   - [💡 什麼時候該用 `asyncio`？](#-什麼時候該用-asyncio)
 
 ---
@@ -53,7 +58,136 @@
 
 ---
 
-## 2. 環境篇：如何在 Jupyter Notebook 執行？
+## 2. 實戰比較:有 asyncio vs 沒有 asyncio
+
+讓我們用一個簡單的例子，直接看出兩者的差異。
+
+### 情境:下載 3 個檔案
+
+假設我們要下載 3 個檔案，每個檔案需要 2 秒下載時間。
+
+### 方法 1:傳統同步寫法 (沒有 asyncio)
+
+```python
+import time
+
+def download_file(file_name):
+    """模擬下載檔案（同步版本）"""
+    print(f"開始下載 {file_name}...")
+    time.sleep(2)  # 模擬下載需要 2 秒
+    print(f"✅ {file_name} 下載完成")
+    return f"{file_name}_data"
+
+# 傳統方式：一個接一個下載
+def main_sync():
+    start = time.time()
+
+    # 下載 3 個檔案（循序執行）
+    result1 = download_file("檔案A.pdf")
+    result2 = download_file("檔案B.pdf")
+    result3 = download_file("檔案C.pdf")
+
+    end = time.time()
+    print(f"\n總耗時: {end - start:.2f} 秒")
+
+# 執行
+main_sync()
+```
+
+**輸出結果:**
+```
+開始下載 檔案A.pdf...
+✅ 檔案A.pdf 下載完成
+開始下載 檔案B.pdf...
+✅ 檔案B.pdf 下載完成
+開始下載 檔案C.pdf...
+✅ 檔案C.pdf 下載完成
+
+總耗時: 6.00 秒  ⏱️ (2 + 2 + 2)
+```
+
+**問題點:**
+- ❌ 程式在等待下載時完全閒置，無法做其他事
+- ❌ 3 個檔案需要 6 秒（2×3）
+- ❌ 如果有 100 個檔案，就要等 200 秒！
+
+---
+
+### 方法 2:使用 asyncio 非同步寫法
+
+```python
+import asyncio
+import time
+
+async def download_file_async(file_name):
+    """模擬下載檔案（非同步版本）"""
+    print(f"開始下載 {file_name}...")
+    await asyncio.sleep(2)  # 關鍵差異：使用 await，讓出控制權
+    print(f"✅ {file_name} 下載完成")
+    return f"{file_name}_data"
+
+# 使用 asyncio：同時下載多個檔案
+async def main_async():
+    start = time.time()
+
+    # 同時啟動 3 個下載任務
+    results = await asyncio.gather(
+        download_file_async("檔案A.pdf"),
+        download_file_async("檔案B.pdf"),
+        download_file_async("檔案C.pdf")
+    )
+
+    end = time.time()
+    print(f"\n總耗時: {end - start:.2f} 秒")
+
+# 執行（在 Jupyter 中直接 await main_async()）
+asyncio.run(main_async())
+```
+
+**輸出結果:**
+```
+開始下載 檔案A.pdf...
+開始下載 檔案B.pdf...
+開始下載 檔案C.pdf...
+✅ 檔案A.pdf 下載完成
+✅ 檔案B.pdf 下載完成
+✅ 檔案C.pdf 下載完成
+
+總耗時: 2.00 秒  ⚡ (3 個檔案同時下載！)
+```
+
+**優勢:**
+- ✅ 3 個檔案同時下載，只需要 2 秒
+- ✅ 速度提升 **3 倍** (6 秒 → 2 秒)
+- ✅ 如果有 100 個檔案，還是只需要 2 秒左右！
+
+---
+
+### 效能比較
+
+| 比較項目 | 同步寫法 | 非同步寫法 (asyncio) |
+|---------|---------|---------------------|
+| **執行方式** | 一個接一個 | 同時進行 |
+| **3 個檔案耗時** | 6 秒 | 2 秒 |
+| **100 個檔案耗時** | 200 秒 | ~2 秒 |
+| **程式碼複雜度** | 簡單 | 稍微複雜（需要 async/await） |
+| **適用情境** | 少量任務、學習階段 | 大量 I/O 任務、爬蟲、API 呼叫 |
+
+**關鍵差異在哪裡？**
+
+```python
+# 同步版本
+time.sleep(2)      # ❌ 程式完全卡住 2 秒，什麼都不能做
+
+# 非同步版本
+await asyncio.sleep(2)  # ✅ 讓出控制權，去處理其他任務
+```
+
+當你使用 `await`，程式會說：「這個任務要等 2 秒，我先去做別的事，等會再回來檢查」。這就是為什麼 3 個檔案可以同時下載！
+
+---
+
+## 3. 環境篇：如何在 Jupyter Notebook 執行？
 
 這是新手最常遇到的坑！`asyncio` 需要一個「事件迴圈 (Event Loop)」來運作。
 
@@ -95,7 +229,7 @@ asyncio.run(main())
 
 ---
 
-## 3. 基礎篇：語法三部曲
+## 4. 基礎篇：語法三部曲
 
 ### 第一步：定義 (`async def`) 與 執行 (`await`)
 
@@ -167,7 +301,7 @@ async def main_concurrent():
 
 ---
 
-## 4. 實戰篇：模擬高效率爬蟲
+## 5. 實戰篇：模擬高效率爬蟲
 
 讓我們模擬抓取 3 個網站的資料。
 
@@ -214,7 +348,7 @@ async def main_crawler():
 
 ---
 
-## 5. 重點總結
+## 6. 重點總結
 
 | 關鍵字 | 說明 | 比喻 |
 | :--- | :--- | :--- |
