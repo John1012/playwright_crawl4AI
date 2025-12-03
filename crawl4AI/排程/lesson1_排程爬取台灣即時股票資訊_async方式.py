@@ -7,17 +7,14 @@ from crawl4ai import AsyncWebCrawler, CrawlerRunConfig, BrowserConfig,CacheMode
 from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
 
 async def crawl_single_url(crawler, url, config):
-    results = await crawler.arun(
-        url,
+    result = await crawler.arun(
+        url=url,
         config=config,
-        wait_for_selector=["h3.astock-name", "span.astock-code"],
-        scroll_delay=10
     )
 
-    for result in results:
-        if result.success:
-            data = json.loads(result.extracted_content)
-            print(json.dumps(data, indent=2, ensure_ascii=False))
+    if result.success:
+        data = json.loads(result.extracted_content)
+        print(json.dumps(data, indent=2, ensure_ascii=False))
 
 async def crawl_stock_info():
     urls = [

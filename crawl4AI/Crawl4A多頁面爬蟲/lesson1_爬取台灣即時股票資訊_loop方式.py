@@ -105,22 +105,18 @@ async def crawl_stock_info():
             verbose=True,            
         )
         
-    for url in urls:
-        async with AsyncWebCrawler(config=browserConfig) as crawler:           
-            results = await crawler.arun(
-                url,
+    async with AsyncWebCrawler(config=browserConfig) as crawler:
+        for url in urls:
+            result = await crawler.arun(
+                url=url,
                 config=config,
-                wait_for_selector=["h3.astock-name", "span.astock-code"],
-                scroll_delay=10,
             )
 
-        
-        for result in results: # noqa
-                if result.success:                
-                    data = json.loads(result.extracted_content)
-                    print(json.dumps(data, indent=2, ensure_ascii=False))
-                else:
-                    print(f"Failed to crawl {result.url}: {result.error_message}")
+            if result.success:
+                data = json.loads(result.extracted_content)
+                print(json.dumps(data, indent=2, ensure_ascii=False))
+            else:
+                print(f"Failed to crawl {result.url}: {result.error_message}")
           
 async def main():
     """主程式入口"""

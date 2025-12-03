@@ -48,7 +48,7 @@ async def extract_crypto_prices():
 
     #3. 設定爬蟲配置
     config = CrawlerRunConfig(
-        cache_mode = CacheMode.BYPASS,
+        cache_mode=CacheMode.BYPASS,
         extraction_strategy=extraction_strategy
     )
 
