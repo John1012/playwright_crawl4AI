@@ -2,6 +2,10 @@
 
 This file helps Claude Code understand the project structure and conventions.
 
+## Note
+Regardless of whether the input in English or Trandition Chinese,Please reply using Trandition Chinese characters
+
+
 ## Project Overview
 
 **Project Name**: Playwright & Crawl4AI 爬蟲教學
