@@ -6,6 +6,10 @@
 - 學會使用 `async def`、`await` 與事件迴圈來撰寫非同步程式。
 - 透過簡單範例，快速上手 `asyncio` 的基本應用。
 
+**漫畫說明**
+
+![sync_async](./images/sync_async.png)
+
 ## 教學大綱
 
 ### 1. 什麼是 `asyncio`？
