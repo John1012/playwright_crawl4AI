@@ -68,27 +68,6 @@ Playwright 是微軟開發的網頁自動化工具。雖然原本是設計給自
 - **功能很完整**：截圖、錄影、攔截網路請求、處理 Cookie...該有的都有
 - **速度很快**：官方宣稱比 Selenium 快 2-3 倍，實際用起來確實有感
 
-### 課程內容（13 章）
-
-[playwright官方網站](https://playwright.dev/)
-
-我們會從最基礎的開始，一步步帶你熟悉這個工具：
-
-| 章節 | 內容 | 重點 |
-|------|------|------|
-| [第 1 章](./playwright/第01章_Playwright簡介/) | Playwright 簡介 | 了解它是什麼、怎麼安裝 |
-| [第 2 章](./playwright/第02章_基礎操作/) | 基礎操作 | 啟動瀏覽器、開啟網頁、點擊按鈕 |
-| [第 3 章](./playwright/第03章_元素定位/) | 元素定位 | CSS 選擇器、XPath、Playwright 內建定位器 |
-| [第 4 章](./playwright/第04章_等待與同步/) | 等待與同步 | 這是重點章節，一定要搞懂等待機制 |
-| [第 5 章](./playwright/第05章_資料擷取/) | 資料擷取 | 怎麼把網頁上的文字、連結、屬性抓下來 |
-| [第 6 章](./playwright/第06章_進階互動/) | 進階互動 | 滑鼠拖曳、鍵盤操作、滾動頁面 |
-| [第 7 章](./playwright/第07章_多頁面與框架處理/) | 多頁面處理 | 處理多個分頁、彈出視窗、iframe |
-| [第 8 章](./playwright/第08章_截圖與錄影/) | 截圖與錄影 | 頁面截圖、操作過程錄影、存成 PDF |
-| [第 9 章](./playwright/第09章_網路請求與回應/) | 網路請求 | 攔截 API 請求、查看回應內容 |
-| [第 10 章](./playwright/第10章_登入與Cookie處理/) | 登入處理 | 自動登入網站、管理 Cookie 保持登入狀態 |
-| [第 11 章](./playwright/第11章_反爬蟲對策/) | 反爬蟲對策 | 怎麼避免被網站擋掉 |
-| [第 12 章](./playwright/第12章_效能優化/) | 效能優化 | 讓爬蟲跑得更快、更省資源 |
-| [第 13 章](./playwright/第13章_實戰專案/) | 實戰專案 | 用前面學的知識寫幾個完整的爬蟲 |
 
 ### 前置知識
 
@@ -305,17 +284,72 @@ pip install crawl4ai
 
 ---
 
-## 其他資源
+## PlayWrite課程內容
 
-### 官方文件
-- [Playwright 官方文件](https://playwright.dev/python/) - API 參考的好地方
-- [Crawl4AI GitHub](https://github.com/unclecode/crawl4ai) - 可以看原始碼和 issue
+[playwright官方網站](https://playwright.dev/)
+
+我們會從最基礎的開始，一步步帶你熟悉這個工具：
+
+| 章節 | 內容 | 重點 |
+|------|------|------|
+| [第 1 章](./playwright/第01章_Playwright簡介/) | Playwright 簡介 | 了解它是什麼、怎麼安裝 |
+| [第 2 章](./playwright/第02章_基礎操作/) | 基礎操作 | 啟動瀏覽器、開啟網頁、點擊按鈕 |
+| [第 3 章](./playwright/第03章_元素定位/) | 元素定位 | CSS 選擇器、XPath、Playwright 內建定位器 |
+| [第 4 章](./playwright/第04章_等待與同步/) | 等待與同步 | 這是重點章節，一定要搞懂等待機制 |
+| [第 5 章](./playwright/第05章_資料擷取/) | 資料擷取 | 怎麼把網頁上的文字、連結、屬性抓下來 |
+| [第 6 章](./playwright/第06章_進階互動/) | 進階互動 | 滑鼠拖曳、鍵盤操作、滾動頁面 |
+| [第 7 章](./playwright/第07章_多頁面與框架處理/) | 多頁面處理 | 處理多個分頁、彈出視窗、iframe |
+| [第 8 章](./playwright/第08章_截圖與錄影/) | 截圖與錄影 | 頁面截圖、操作過程錄影、存成 PDF |
+| [第 9 章](./playwright/第09章_網路請求與回應/) | 網路請求 | 攔截 API 請求、查看回應內容 |
+| [第 10 章](./playwright/第10章_登入與Cookie處理/) | 登入處理 | 自動登入網站、管理 Cookie 保持登入狀態 |
+| [第 11 章](./playwright/第11章_反爬蟲對策/) | 反爬蟲對策 | 怎麼避免被網站擋掉 |
+| [第 12 章](./playwright/第12章_效能優化/) | 效能優化 | 讓爬蟲跑得更快、更省資源 |
+| [第 13 章](./playwright/第13章_實戰專案/) | 實戰專案 | 用前面學的知識寫幾個完整的爬蟲 |
+
+---
+
+## Crawl4AI 課程內容
+
+[Crawl4AI GitHub 官方網站](https://github.com/unclecode/crawl4ai)
+
+我們會從最基礎的開始，一步步帶你熟悉這個工具：
+
+| 章節 | 內容 | 重點 |
+|------|------|------|
+| [初體驗](./crawl4AI/初體驗/) | 第一個 Crawl4AI 程式 | 快速上手，感受差別 |
+| [快速入門](./crawl4AI/Crawl4A快速入門/) | 基本配置和內容過濾 | 學會基礎設定和資料抓取 |
+| [CSS Schema](./crawl4AI/Crawl4A快速入門/手動方式產生css_schema/) | 手動定義資料結構 | 不用 LLM 的方法 |
+| [JavaScript 操控](./crawl4AI/Crawl4A操控javascript/) | 處理動態內容 | 滾動、點擊、等待操作 |
+| [多頁面爬蟲](./crawl4AI/Crawl4A多頁面爬蟲/) | 批次爬取多個網頁 | 使用 arun_many() 加速 |
+| [排程任務](./crawl4AI/排程/) | 定時自動執行 | 讓爬蟲在背景執行 |
+| [實際案例](./crawl4AI/實際案例/) | 完整的真實專案 | 匯率、股票資訊、GUI 應用 |
+| [Asyncio 教學](./crawl4AI/asyncio套件教學/) | Python 非同步編程 | **重要：學 Crawl4AI 前必讀** |
+
+## 官方資源與連結
+
+### Playwright
+- [官方網站](https://playwright.dev/)
+- [Python 版本文件](https://playwright.dev/python)
+- [API 參考](https://playwright.dev/python/docs/api/class-playwright)
+- [快速入門](https://playwright.dev/python/docs/intro)
+- [疑難排解](https://playwright.dev/python/docs/troubleshooting)
+
+### Crawl4AI
+- [GitHub 官方倉庫](https://github.com/unclecode/crawl4ai)
+- [原始碼和 Issue](https://github.com/unclecode/crawl4ai/issues)
+- [使用範例](https://github.com/unclecode/crawl4ai/tree/main/examples)
+
+### 相關技術
+- [CSS 選擇器](https://developer.mozilla.org/zh-TW/docs/Web/CSS/CSS_Selectors)
+- [XPath 語法](https://developer.mozilla.org/zh-TW/docs/Web/XPath)
+- [Python Asyncio 文件](https://docs.python.org/3/library/asyncio.html)
 
 ### 遇到問題？
 
 1. 先查各章節的 README，可能有解答
 2. 看看實際案例的程式碼，參考別人是怎麼寫的
 3. 檢查錯誤訊息，通常會提示問題在哪
+4. 查看官方文件的疑難排解部分
 
 ---
 
