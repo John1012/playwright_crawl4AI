@@ -115,6 +115,8 @@ main_sync()
 
 ### 方法 2:使用 asyncio 非同步寫法
 
+![說明Event_loop的工作方式](./images/event_loop.png)
+
 ```python
 import asyncio
 import time
