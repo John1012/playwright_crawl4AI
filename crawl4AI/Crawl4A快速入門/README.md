@@ -1,6 +1,11 @@
 # Crawl4A快速入門
 [官方的Quick Start](https://docs.crawl4ai.com/core/quickstart/)
 
+## 📚 重要參考資料
+[**Crawl4AI v0.7.7 主要實體介紹**](./crawl4ai_entities.md) - 了解 AsyncWebCrawler、BrowserConfig、CrawlerRunConfig 等核心類別的詳細說明
+
+---
+
 - 使用最小的配置,運行爬蟲
 - 產生Markdown的輸出（並了解他如何受到內容過濾器的影響)
 - 嘗試一種基於CSS的簡單提取策略
