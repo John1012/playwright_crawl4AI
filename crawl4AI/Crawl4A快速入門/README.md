@@ -262,118 +262,291 @@ async def extract_crypto_prices():
 await extract_crypto_prices()
 ```
 
-**5.3 透過本地模型產生css_schema**
+**5.3 使用 LLM 自動產生 CSS Schema**
 
-**5.4 透過gemini,openai,anthropic產生css_schema**
+當網頁結構複雜或你不熟悉 CSS 選擇器時，可以讓 LLM（大型語言模型）自動分析 HTML 並產生 Schema。這個方法有**一次性成本**（呼叫 LLM），但產生的 Schema 可以重複使用，無需再次呼叫 LLM。
 
-[**透過llama和Gemini模型實作的.ipynb**](./lesson4_css_base_使用llm建立schema.ipynb)
+#### 📋 LLM 產生 Schema 的工作原理
 
-**下方是透過本地模型產生schema的程式碼**
+1. **提供 HTML 範例** → LLM 分析結構
+2. **LLM 識別模式** → 找出重複元素、類別名稱
+3. **自動產生 CSS 選擇器** → 建立 Schema
+4. **重複使用 Schema** → 後續擷取無需 LLM
+
+#### ⚖️ 三種 Schema 產生方式比較
+
+| 方式 | 控制程度 | 精確度 | LLM 成本 | 適用場景 |
+|------|---------|--------|---------|---------|
+| **手動定義** | 高 | 高 | 無 | 生產環境、結構已知 |
+| **LLM 自動產生** | 低 | 中 | 一次性 | 快速原型、探索性爬蟲 |
+| **LLM 提示詞引導** | 中 | 高 | 每次 | 複雜擷取、非結構化內容 |
+
+---
+
+### 5.3.1 使用本地模型（Ollama）產生 Schema
+
+**優點：**
+- ✅ 免費、無需 API 金鑰
+- ✅ 資料隱私（在本機執行）
+- ✅ 支援多種開源模型
+
+**前置需求：**
+```bash
+# 安裝 Ollama
+# 參考：https://ollama.ai
+
+# 下載模型
+ollama pull llama3.2
+```
+
+[**透過 llama 和 Gemini 模型實作的 .ipynb**](./lesson4_css_base_使用llm建立schema.ipynb)
+
+**程式碼範例：**
 
 ```python
-from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
-from crawl4ai import LLMConfig, AsyncWebCrawler,CacheMode,CrawlerRunConfig
+import asyncio
 import json
 from pprint import pprint
+from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
+from crawl4ai import LLMConfig, AsyncWebCrawler, CacheMode, CrawlerRunConfig
 
-# Generate a schema (one-time cost)
-#html = "<div class='product'><h2>Gaming Laptop</h2><span class='price'>$999.99</span></div>"
-html = "<div class='item'><h2>Item 1</h2><a href='https://example.com/item1'>Link 1</a></div>"
+async def main():
+    # 步驟 1: 準備 HTML 範例（用於讓 LLM 學習結構）
+    html = """
+    <div class='item'>
+        <h2>Item 1</h2>
+        <a href='https://example.com/item1'>Link 1</a>
+    </div>
+    """
 
-# Or using Ollama (open source, no token needed)
-schema = JsonCssExtractionStrategy.generate_schema(
-    html,
-    llm_config = LLMConfig(provider="ollama/llama3.2", api_token=None)  # Not needed for Ollama
-)
-
-# Use the schema for fast, repeated extractions
-strategy = JsonCssExtractionStrategy(schema)
-
-#非常重要,一定要有CrawlerRunConfig的實體
-#一定要有extraction_strategy的引數名稱
-#不然使用result.extracted_content會是None
-
-config = CrawlerRunConfig(
-    cache_mode=CacheMode.BYPASS,
-    extraction_strategy=strategy
-)
-
-async with AsyncWebCrawler() as crawler:
-    result = await crawler.arun(
-        url = f"raw://{html}",
-        config=config
+    # 步驟 2: 使用 Ollama 本地模型自動產生 Schema（一次性成本）
+    # LLM 會分析 HTML 結構並自動產生 CSS 選擇器
+    schema = JsonCssExtractionStrategy.generate_schema(
+        html,
+        llm_config=LLMConfig(
+            provider="ollama/llama3.2",  # 使用本地 Ollama 模型
+            api_token=None               # 本地模型不需要 API 金鑰
+        )
     )
 
-    print("=====lamma3.2產生的schema=========")
+    print("===== Llama3.2 自動產生的 Schema =========")
     pprint(schema)
-    data = json.loads(result.extracted_content)
-    print("==========擷取結果==========")
-    pprint(data)
+    print("\n說明：此 Schema 由 LLM 自動分析 HTML 產生")
+    print("      後續擷取可重複使用，無需再次呼叫 LLM\n")
 
+    # 步驟 3: 使用產生的 Schema 建立擷取策略
+    strategy = JsonCssExtractionStrategy(schema)
+
+    # 步驟 4: 設定爬蟲配置
+    # ⚠️ 重要：必須明確指定 extraction_strategy 參數
+    # 否則 result.extracted_content 會是 None
+    config = CrawlerRunConfig(
+        cache_mode=CacheMode.BYPASS,
+        extraction_strategy=strategy  # 必須指定
+    )
+
+    # 步驟 5: 執行爬蟲擷取資料
+    async with AsyncWebCrawler() as crawler:
+        result = await crawler.arun(
+            url=f"raw://{html}",
+            config=config
+        )
+
+        print("========== 擷取結果 ==========")
+        data = json.loads(result.extracted_content)
+        pprint(data)
+
+if __name__ == "__main__":
+    await main()  # Jupyter Notebook 環境
+    # asyncio.run(main())  # 一般 Python 環境
 ```
 
+**執行結果範例：**
+```python
+# LLM 自動產生的 Schema
+{
+    'name': 'Items',
+    'baseSelector': 'div.item',
+    'fields': [
+        {'name': 'title', 'selector': 'h2', 'type': 'text'},
+        {'name': 'link', 'selector': 'a', 'type': 'attribute', 'attribute': 'href'}
+    ]
+}
 
-**下方是透過gemini的擷取的程式碼**
+# 擷取結果
+[
+    {
+        'title': 'Item 1',
+        'link': 'https://example.com/item1'
+    }
+]
+```
+
+---
+
+### 5.3.2 使用雲端 LLM（Gemini/OpenAI/Claude）產生 Schema
+
+**優點：**
+- ✅ 更強大的推理能力
+- ✅ 更準確的 Schema 產生
+- ✅ 支援複雜 HTML 結構
+
+**缺點：**
+- ❌ 需要 API 金鑰和付費
+- ❌ 資料需上傳至雲端
+
+#### 使用 Google Gemini
 
 ```python
-from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
-from crawl4ai import LLMConfig,CrawlerRunConfig
+import asyncio
+import json
 from pprint import pprint
+from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
+from crawl4ai import LLMConfig, AsyncWebCrawler, CacheMode, CrawlerRunConfig
 
-# Generate a schema (one-time cost)
-html = """
-<html>
-    <body>
-        <div class='product'>
-            <h2>Gaming Laptop</h2>
-            <span class='price'>$999.99</span>
-        </div>
-    <body>
-</html>
-"""
+async def main():
+    # 準備 HTML 範例
+    html = """
+    <html>
+        <body>
+            <div class='product'>
+                <h2>Gaming Laptop</h2>
+                <span class='price'>$999.99</span>
+            </div>
+        </body>
+    </html>
+    """
 
-# Using OpenAI (requires API token)
+    # 使用 Gemini 模型產生 Schema
+    schema = JsonCssExtractionStrategy.generate_schema(
+        html,
+        llm_config=LLMConfig(
+            provider="gemini/gemini-2.0-flash-exp",     # Gemini 模型
+            api_token="YOUR_GEMINI_API_KEY"  # 替換為你的 API 金鑰
+        )
+    )
 
+    print("====== Gemini 自動產生的 Schema ======")
+    pprint(schema)
+
+    # 使用產生的 Schema 進行擷取
+    strategy = JsonCssExtractionStrategy(schema, verbose=True)
+
+    config = CrawlerRunConfig(
+        cache_mode=CacheMode.BYPASS,
+        extraction_strategy=strategy
+    )
+
+    async with AsyncWebCrawler() as crawler:
+        result = await crawler.arun(
+            url=f"raw://{html}",
+            config=config
+        )
+
+        print("\n======= 擷取結果 ===========")
+        data = json.loads(result.extracted_content)
+        pprint(data)
+
+if __name__ == "__main__":
+    await main()
+```
+
+#### 使用 OpenAI GPT
+
+```python
+# 只需更改 LLM 配置
 schema = JsonCssExtractionStrategy.generate_schema(
     html,
-    llm_config = LLMConfig(        
-        provider="gemini/gemini-2.5-flash",
-        api_token="gemini api key")  # Required for OpenAI
-)
-
-# 手動產生的schema
-# schema = {
-#     'name': 'Product Details',
-#     'baseSelector': '.product',
-#     'fields': [
-#         {'name': 'title', 
-#          'selector': 'h2', 
-#          'type': 'text'},
-#         {'name': 'price',
-#          'selector': '.price',
-#          'type': 'text'}]
-# }
-
-# Use the schema for fast, repeated extractions
-strategy = JsonCssExtractionStrategy(schema,verbose=True)
-
-#3. 設定爬蟲配置
-config = CrawlerRunConfig(
-    cache_mode = CacheMode.BYPASS,
-    extraction_strategy=strategy
-)
-async with AsyncWebCrawler() as crawler:
-    raw_url = f"raw://{html}"
-    result = await crawler.arun(
-        url = raw_url,
-        config=config
+    llm_config=LLMConfig(
+        provider="openai/gpt-4o-mini",      # OpenAI 模型
+        api_token="YOUR_OPENAI_API_KEY"  # OpenAI API 金鑰
     )
-    print("======Gmini 自動產生的schema======")
-    print(schema)
-    print("=======取出的結果===========")
-    data = json.loads(result.extracted_content)
-    print(data)
+)
 ```
+
+#### 使用 Anthropic Claude
+
+```python
+# 只需更改 LLM 配置
+schema = JsonCssExtractionStrategy.generate_schema(
+    html,
+    llm_config=LLMConfig(
+        provider="anthropic/claude-3-5-sonnet-20241022",  # Claude 模型
+        api_token="YOUR_ANTHROPIC_API_KEY"     # Anthropic API 金鑰
+    )
+)
+```
+
+---
+
+### 5.3.3 手動 Schema vs LLM 產生的比較
+
+```python
+# 方法 A: LLM 自動產生（快速但不可控）
+schema_auto = JsonCssExtractionStrategy.generate_schema(
+    html,
+    llm_config=LLMConfig(provider="ollama/llama3.2", api_token=None)
+)
+
+# 方法 B: 手動定義（精確可控）
+schema_manual = {
+    'name': 'Product Details',
+    'baseSelector': '.product',
+    'fields': [
+        {'name': 'title', 'selector': 'h2', 'type': 'text'},
+        {'name': 'price', 'selector': '.price', 'type': 'text'}
+    ]
+}
+
+# 兩者都可以用於建立擷取策略
+strategy_auto = JsonCssExtractionStrategy(schema_auto)
+strategy_manual = JsonCssExtractionStrategy(schema_manual)
+```
+
+---
+
+### 5.3.4 完整實作範例
+
+[**查看完整範例：manual_control_example.py**](./manual_control_example.py)
+
+這個範例展示了三種控制 Schema 的方法：
+1. LLM 自動產生（快速原型）
+2. 手動定義 Schema（生產環境）
+3. 使用自訂提示詞引導 LLM（複雜擷取）
+
+---
+
+### 🎯 使用建議
+
+| 場景 | 推薦方式 | 原因 |
+|------|---------|------|
+| 🚀 快速原型開發 | LLM 自動產生 | 快速、自動化 |
+| 🏭 生產環境 | 手動定義 Schema | 精確、快速、無 LLM 成本 |
+| 🔬 複雜網頁探索 | LLM 自動產生 | 節省手動分析時間 |
+| 📊 大規模爬蟲 | 手動定義 Schema | 避免重複 LLM 成本 |
+| 🧩 非結構化內容 | LLMExtractionStrategy | 需要 AI 理解語義 |
+
+---
+
+### ⚠️ 重要注意事項
+
+1. **Schema 可重複使用**
+   產生一次後，儲存 Schema 並重複使用，避免每次都呼叫 LLM
+
+2. **必須指定 extraction_strategy**
+   ```python
+   config = CrawlerRunConfig(
+       extraction_strategy=strategy  # 必須明確指定
+   )
+   ```
+   否則 `result.extracted_content` 會是 `None`
+
+3. **本地 vs 雲端 LLM**
+   - 開發/測試 → 使用 Ollama（免費）
+   - 複雜任務 → 使用雲端 LLM（更準確）
+
+4. **HTML 範例品質**
+   提供完整且具代表性的 HTML 範例，LLM 才能產生準確的 Schema
 
 
 
