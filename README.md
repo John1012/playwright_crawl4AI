@@ -21,7 +21,7 @@
 
 1. **先學 Playwright 基礎** → [開始 Playwright 學習](./playwright/第01章_Playwright簡介/README.md)
 2. **學習 Asyncio 非同步編程** → [Asyncio 教學](./crawl4AI/asyncio套件教學/)（⚠️ 學 Crawl4AI 前必讀）
-3. **再學 Crawl4AI 進階** → [開始 Crawl4AI 學習](#crawl4A-課程)
+3. **再學 Crawl4AI 進階** → [開始 Crawl4AI 學習](#Crawl4AI-課程)
 
 ### 環境需求
 
