@@ -2,6 +2,25 @@
 
 學習如何提升爬蟲的執行效率。
 
+## 📁 本章檔案
+
+- **[`performance_example.py`](./performance_example.py)** - 效能優化範例程式
+- **[`performance_demo.html`](./performance_demo.html)** - 效能測試頁面
+- **`README.md`** - 本章教學文件
+
+## 🚀 快速開始
+
+```bash
+# 執行示範程式
+python performance_example.py
+```
+
+程式會自動開啟 `performance_demo.html` 並展示多種效能優化技巧：
+- 資源阻擋（圖片、字體、媒體）
+- 無頭模式 vs 有頭模式比較
+- 批次處理策略
+- 記憶體效率優化
+
 ## 12.1 提升爬蟲速度
 
 ### 禁用圖片載入

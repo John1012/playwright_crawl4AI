@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登入與 Cookie 處理示範</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+        }
+
+        /* 登入表單 */
+        .login-container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .login-container.hidden {
+            display: none;
+        }
+
+        .login-container h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .remember-me input {
+            width: auto;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .test-accounts {
+            margin-top: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .test-accounts h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        /* 會員儀表板 */
+        .dashboard-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .dashboard-container.show {
+            display: block;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .dashboard-header h1 {
+            color: #667eea;
+            font-size: 1.5em;
+        }
+
+        .logout-btn {
+            padding: 8px 15px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .user-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .user-info h2 {
+            margin-bottom: 10px;
+        }
+
+        .user-info p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .dashboard-section {
+            margin-bottom: 20px;
+        }
+
+        .dashboard-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-item .number {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-item .label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-list li {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .activity-list li:last-child {
+            border-bottom: none;
+        }
+
+        .activity-time {
+            color: #999;
+            font-size: 13px;
+        }
+
+        .cookie-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .cookie-info h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .cookie-info code {
+            display: block;
+            background: #fff;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+            word-break: break-all;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 登入表單 -->
+        <div class="login-container" id="loginForm">
+            <h1>🔐 會員登入</h1>
+            <form id="loginFormElement">
+                <div class="form-group">
+                    <label for="username">用戶名</label>
+                    <input type="text" id="username" name="username" placeholder="請輸入用戶名" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密碼</label>
+                    <input type="password" id="password" name="password" placeholder="請輸入密碼" required>
+                </div>
+                <div class="remember-me">
+                    <input type="checkbox" id="rememberMe" name="rememberMe">
+                    <label for="rememberMe">記住我（儲存 Cookie）</label>
+                </div>
+                <button type="submit" class="login-btn">登入</button>
+            </form>
+            <div class="error-message" id="errorMsg">
+                用戶名或密碼錯誤
+            </div>
+            <div class="test-accounts">
+                <h3>📝 測試帳號</h3>
+                <p><strong>用戶名：</strong>admin</p>
+                <p><strong>密碼：</strong>password123</p>
+            </div>
+        </div>
+
+        <!-- 會員儀表板 -->
+        <div class="dashboard-container" id="dashboard">
+            <div class="dashboard-header">
+                <h1>👋 歡迎回來！</h1>
+                <button class="logout-btn" id="logoutBtn">登出</button>
+            </div>
+            
+            <div class="user-info">
+                <h2 id="welcomeUser">用戶</h2>
+                <p>上次登入：<span id="lastLogin">-</span></p>
+                <p>會員等級：VIP 會員</p>
+            </div>
+
+            <div class="dashboard-section">
+                <h3>📊 帳戶統計</h3>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="number" id="pointsValue">1,250</div>
+                        <div class="label">積分</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number" id="ordersValue">23</div>
+                        <div class="label">訂單數</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number" id="couponsValue">5</div>
+                        <div class="label">優惠券</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h3>📋 最近活動</h3>
+                <ul class="activity-list" id="activityList">
+                    <li>
+                        <span>登入成功</span>
+                        <span class="activity-time">剛剛</span>
+                    </li>
+                    <li>
+                        <span>購買商品 - Playwright 教學書</span>
+                        <span class="activity-time">2 天前</span>
+                    </li>
+                    <li>
+                        <span>兌換優惠券</span>
+                        <span class="activity-time">1 週前</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="cookie-info">
+                <h4>🍪 目前的 Cookie 資訊</h4>
+                <p>以下是您的登入 Cookie（Playwright 可以儲存和重複使用）：</p>
+                <code id="cookieDisplay">-</code>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模擬的用戶資料
+        const validUser = {
+            username: 'admin',
+            password: 'password123'
+        };
+
+        // 檢查是否有已儲存的登入狀態
+        function checkLoginState() {
+            const savedUser = getCookie('loggedInUser');
+            const sessionToken = getCookie('sessionToken');
+            
+            if (savedUser && sessionToken) {
+                showDashboard(savedUser);
+                return true;
+            }
+            return false;
+        }
+
+        // Cookie 工具函數
+        function setCookie(name, value, days) {
+            const expires = new Date();
+            expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        function deleteCookie(name) {
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        }
+
+        // 顯示儀表板
+        function showDashboard(username) {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('dashboard').classList.add('show');
+            document.getElementById('welcomeUser').textContent = username;
+            document.getElementById('lastLogin').textContent = new Date().toLocaleString();
+            
+            // 顯示 Cookie 資訊
+            document.getElementById('cookieDisplay').textContent = document.cookie || '(無 Cookie)';
+        }
+
+        // 顯示登入表單
+        function showLoginForm() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('dashboard').classList.remove('show');
+        }
+
+        // 登入表單提交
+        document.getElementById('loginFormElement').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            if (username === validUser.username && password === validUser.password) {
+                // 登入成功
+                const sessionToken = 'token_' + Math.random().toString(36).substr(2, 16);
+                
+                // 設定 Cookie
+                const days = rememberMe ? 7 : 1;
+                setCookie('loggedInUser', username, days);
+                setCookie('sessionToken', sessionToken, days);
+                setCookie('loginTime', new Date().toISOString(), days);
+                
+                showDashboard(username);
+            } else {
+                // 登入失敗
+                document.getElementById('errorMsg').classList.add('show');
+                setTimeout(() => {
+                    document.getElementById('errorMsg').classList.remove('show');
+                }, 3000);
+            }
+        });
+
+        // 登出
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            deleteCookie('loggedInUser');
+            deleteCookie('sessionToken');
+            deleteCookie('loginTime');
+            
+            showLoginForm();
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        });
+
+        // 頁面載入時檢查登入狀態
+        checkLoginState();
+    </script>
+</body>
+</html>

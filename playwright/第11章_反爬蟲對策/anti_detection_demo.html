@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>反爬蟲測試頁面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #ff6b6b;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+
+        .section h2 {
+            color: #feca57;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .detection-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detection-item.pass {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+
+        .detection-item.fail {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+
+        .detection-item.warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .status-pass {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-fail {
+            background: #dc3545;
+            color: white;
+        }
+
+        .status-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .info-display {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .info-display pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .result-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result-summary h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .score-display {
+            font-size: 3em;
+            font-weight: bold;
+        }
+
+        .tips-box {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .tips-box h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .tips-box ul {
+            padding-left: 20px;
+        }
+
+        .tips-box li {
+            margin: 8px 0;
+            color: #555;
+        }
+
+        .mouse-tracker {
+            width: 100%;
+            height: 150px;
+            background: #f0f0f0;
+            border-radius: 8px;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mouse-dot {
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            position: absolute;
+            pointer-events: none;
+            transition: all 0.1s;
+        }
+
+        .interaction-counter {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .counter-item {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .counter-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+
+        .counter-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ 反爬蟲檢測測試</h1>
+
+        <div class="result-summary" id="resultSummary">
+            <h3>檢測分數</h3>
+            <div class="score-display" id="scoreDisplay">--</div>
+            <p id="scoreMessage">點擊「開始檢測」進行分析</p>
+        </div>
+
+        <div class="section">
+            <h2>1️⃣ 瀏覽器指紋檢測</h2>
+            <button id="runDetection">開始檢測</button>
+            <div id="detectionResults"></div>
+        </div>
+
+        <div class="section">
+            <h2>2️⃣ 瀏覽器資訊</h2>
+            <div class="info-display">
+                <pre id="browserInfo">點擊「開始檢測」查看瀏覽器資訊</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>3️⃣ 滑鼠軌跡追蹤</h2>
+            <p>真實用戶的滑鼠移動會有自然的軌跡，機器人通常是直線移動。</p>
+            <div class="mouse-tracker" id="mouseTracker">
+                <div class="mouse-dot" id="mouseDot" style="display: none;"></div>
+            </div>
+            <div class="interaction-counter">
+                <div class="counter-item">
+                    <div class="counter-value" id="moveCount">0</div>
+                    <div class="counter-label">滑鼠移動</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-value" id="clickCount">0</div>
+                    <div class="counter-label">點擊次數</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-value" id="scrollCount">0</div>
+                    <div class="counter-label">滾動次數</div>
+                </div>
+                <div class="counter-item">
+                    <div class="counter-value" id="keyCount">0</div>
+                    <div class="counter-label">按鍵次數</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>4️⃣ 請求頻率測試</h2>
+            <p>真實用戶的請求間隔通常是不規則的。</p>
+            <button id="simulateRequest">模擬 API 請求</button>
+            <div class="info-display">
+                <p>請求記錄：</p>
+                <pre id="requestLog">尚無請求</pre>
+            </div>
+        </div>
+
+        <div class="tips-box">
+            <h3>💡 反爬蟲應對技巧</h3>
+            <ul>
+                <li><strong>設定真實的 User-Agent：</strong>使用常見瀏覽器的 User-Agent</li>
+                <li><strong>模擬人類行為：</strong>加入隨機延遲、滑鼠移動和滾動</li>
+                <li><strong>使用代理伺服器：</strong>避免 IP 被封鎖</li>
+                <li><strong>處理 Cookie：</strong>正確儲存和發送 Cookie</li>
+                <li><strong>隱藏 WebDriver 特徵：</strong>移除自動化工具的識別標記</li>
+                <li><strong>控制請求頻率：</strong>在請求之間加入隨機延遲</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 計數器
+        let moveCount = 0;
+        let clickCount = 0;
+        let scrollCount = 0;
+        let keyCount = 0;
+        let requestLog = [];
+
+        // 瀏覽器指紋檢測
+        function runDetection() {
+            const results = [];
+            let score = 100;
+
+            // 1. WebDriver 檢測
+            const hasWebDriver = navigator.webdriver === true;
+            results.push({
+                name: 'WebDriver 檢測',
+                pass: !hasWebDriver,
+                detail: hasWebDriver ? '偵測到 WebDriver（可能是自動化工具）' : '未偵測到 WebDriver'
+            });
+            if (hasWebDriver) score -= 30;
+
+            // 2. Headless 檢測
+            const isHeadless = /HeadlessChrome/.test(navigator.userAgent);
+            results.push({
+                name: 'Headless 模式檢測',
+                pass: !isHeadless,
+                detail: isHeadless ? '偵測到 Headless Chrome' : '正常瀏覽器模式'
+            });
+            if (isHeadless) score -= 20;
+
+            // 3. User-Agent 檢測
+            const ua = navigator.userAgent;
+            const isValidUA = ua.includes('Chrome') || ua.includes('Firefox') || ua.includes('Safari');
+            results.push({
+                name: 'User-Agent 檢測',
+                pass: isValidUA,
+                detail: isValidUA ? '有效的瀏覽器 User-Agent' : '可疑的 User-Agent'
+            });
+            if (!isValidUA) score -= 15;
+
+            // 4. 螢幕解析度檢測
+            const hasScreen = window.screen.width > 0 && window.screen.height > 0;
+            const isReasonableSize = window.screen.width >= 800 && window.screen.height >= 600;
+            results.push({
+                name: '螢幕解析度檢測',
+                pass: hasScreen && isReasonableSize,
+                detail: `${window.screen.width} x ${window.screen.height}`
+            });
+            if (!isReasonableSize) score -= 10;
+
+            // 5. 語言設定檢測
+            const hasLanguage = navigator.language && navigator.language.length > 0;
+            results.push({
+                name: '語言設定檢測',
+                pass: hasLanguage,
+                detail: hasLanguage ? `語言：${navigator.language}` : '未設定語言'
+            });
+            if (!hasLanguage) score -= 5;
+
+            // 6. Cookie 支援檢測
+            const cookieEnabled = navigator.cookieEnabled;
+            results.push({
+                name: 'Cookie 支援檢測',
+                pass: cookieEnabled,
+                detail: cookieEnabled ? '支援 Cookie' : '不支援 Cookie'
+            });
+            if (!cookieEnabled) score -= 10;
+
+            // 7. 時區檢測
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const hasTimezone = timezone && timezone.length > 0;
+            results.push({
+                name: '時區設定檢測',
+                pass: hasTimezone,
+                detail: hasTimezone ? `時區：${timezone}` : '未設定時區'
+            });
+            if (!hasTimezone) score -= 5;
+
+            // 8. Canvas 指紋檢測
+            let canvasSupport = false;
+            try {
+                const canvas = document.createElement('canvas');
+                canvasSupport = !!(canvas.getContext && canvas.getContext('2d'));
+            } catch (e) {}
+            results.push({
+                name: 'Canvas 支援檢測',
+                pass: canvasSupport,
+                detail: canvasSupport ? '支援 Canvas' : '不支援 Canvas'
+            });
+            if (!canvasSupport) score -= 5;
+
+            // 顯示結果
+            displayResults(results, score);
+            displayBrowserInfo();
+        }
+
+        function displayResults(results, score) {
+            const container = document.getElementById('detectionResults');
+            let html = '';
+
+            results.forEach(result => {
+                const statusClass = result.pass ? 'pass' : 'fail';
+                const badgeClass = result.pass ? 'status-pass' : 'status-fail';
+                const statusText = result.pass ? '通過' : '可疑';
+
+                html += `
+                    <div class="detection-item ${statusClass}">
+                        <div>
+                            <strong>${result.name}</strong>
+                            <p style="font-size: 13px; color: #666; margin-top: 5px;">${result.detail}</p>
+                        </div>
+                        <span class="status-badge ${badgeClass}">${statusText}</span>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            // 更新分數顯示
+            document.getElementById('scoreDisplay').textContent = score + '/100';
+            let message = '';
+            if (score >= 90) {
+                message = '✅ 看起來像真實用戶！';
+            } else if (score >= 70) {
+                message = '⚠️ 有一些可疑特徵';
+            } else {
+                message = '❌ 高度懷疑是自動化工具';
+            }
+            document.getElementById('scoreMessage').textContent = message;
+        }
+
+        function displayBrowserInfo() {
+            const info = {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                languages: navigator.languages,
+                cookieEnabled: navigator.cookieEnabled,
+                webdriver: navigator.webdriver,
+                screenWidth: window.screen.width,
+                screenHeight: window.screen.height,
+                colorDepth: window.screen.colorDepth,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                hardwareConcurrency: navigator.hardwareConcurrency,
+                deviceMemory: navigator.deviceMemory || 'N/A'
+            };
+
+            document.getElementById('browserInfo').textContent = JSON.stringify(info, null, 2);
+        }
+
+        // 事件監聽器
+        document.getElementById('runDetection').addEventListener('click', runDetection);
+
+        // 滑鼠追蹤
+        const tracker = document.getElementById('mouseTracker');
+        const dot = document.getElementById('mouseDot');
+
+        tracker.addEventListener('mousemove', function(e) {
+            moveCount++;
+            document.getElementById('moveCount').textContent = moveCount;
+            
+            const rect = tracker.getBoundingClientRect();
+            dot.style.display = 'block';
+            dot.style.left = (e.clientX - rect.left - 5) + 'px';
+            dot.style.top = (e.clientY - rect.top - 5) + 'px';
+        });
+
+        tracker.addEventListener('mouseleave', function() {
+            dot.style.display = 'none';
+        });
+
+        // 點擊追蹤
+        document.addEventListener('click', function() {
+            clickCount++;
+            document.getElementById('clickCount').textContent = clickCount;
+        });
+
+        // 滾動追蹤
+        document.addEventListener('scroll', function() {
+            scrollCount++;
+            document.getElementById('scrollCount').textContent = scrollCount;
+        });
+
+        // 按鍵追蹤
+        document.addEventListener('keydown', function() {
+            keyCount++;
+            document.getElementById('keyCount').textContent = keyCount;
+        });
+
+        // 請求模擬
+        document.getElementById('simulateRequest').addEventListener('click', function() {
+            const now = new Date();
+            const timestamp = now.toLocaleTimeString() + '.' + now.getMilliseconds();
+            
+            requestLog.push({
+                time: timestamp,
+                interval: requestLog.length > 0 ? 
+                    (now - new Date('2000-01-01 ' + requestLog[requestLog.length - 1].time.split('.')[0])) + 'ms' : 
+                    'N/A'
+            });
+
+            if (requestLog.length > 10) {
+                requestLog = requestLog.slice(-10);
+            }
+
+            let logText = requestLog.map((r, i) => 
+                `#${i + 1} - ${r.time}`
+            ).join('\n');
+            
+            document.getElementById('requestLog').textContent = logText;
+        });
+
+        // 頁面載入時自動執行檢測
+        window.addEventListener('load', function() {
+            setTimeout(runDetection, 500);
+        });
+    </script>
+</body>
+</html>

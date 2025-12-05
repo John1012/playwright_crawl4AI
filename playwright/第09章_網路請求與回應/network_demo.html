@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網路請求與回應示範</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #4facfe;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+
+        .section h2 {
+            color: #00f2fe;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            color: #4facfe;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .loading.show {
+            display: block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #4facfe;
+            min-height: 50px;
+        }
+
+        .result pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .data-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid #00f2fe;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-item .price {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .api-endpoint {
+            font-family: monospace;
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 網路請求與回應示範</h1>
+
+        <!-- 1. 模擬 API 請求 -->
+        <div class="section">
+            <h2>1️⃣ 模擬 API 請求 - 取得用戶資料</h2>
+            <p>端點：<span class="api-endpoint">/api/users</span></p>
+            <button id="fetchUsers">載入用戶資料</button>
+            <div class="loading" id="loading1">正在請求 API...</div>
+            <div class="result" id="usersResult">
+                點擊按鈕載入用戶資料
+            </div>
+        </div>
+
+        <!-- 2. 模擬商品 API -->
+        <div class="section">
+            <h2>2️⃣ 模擬 API 請求 - 取得商品列表</h2>
+            <p>端點：<span class="api-endpoint">/api/products</span></p>
+            <button id="fetchProducts">載入商品列表</button>
+            <div class="loading" id="loading2">正在請求 API...</div>
+            <div class="result" id="productsResult">
+                點擊按鈕載入商品列表
+            </div>
+        </div>
+
+        <!-- 3. POST 請求模擬 -->
+        <div class="section">
+            <h2>3️⃣ 模擬 POST 請求 - 提交表單</h2>
+            <p>端點：<span class="api-endpoint">/api/submit</span></p>
+            <div style="margin-bottom: 10px;">
+                <input type="text" id="submitInput" placeholder="輸入要提交的內容" 
+                       style="padding: 8px; border: 2px solid #ddd; border-radius: 5px; width: 250px;">
+            </div>
+            <button id="submitData">提交資料 (POST)</button>
+            <div class="loading" id="loading3">正在提交資料...</div>
+            <div class="result" id="submitResult">
+                輸入內容並點擊提交
+            </div>
+        </div>
+
+        <!-- 4. 即時資料更新 -->
+        <div class="section">
+            <h2>4️⃣ 即時資料更新模擬</h2>
+            <p>模擬定時從伺服器獲取更新的資料</p>
+            <button id="startPolling">開始即時更新</button>
+            <button id="stopPolling" disabled>停止更新</button>
+            <div class="loading" id="loading4">正在獲取更新...</div>
+            <div class="result" id="pollingResult">
+                <p>最後更新時間：<span id="lastUpdate">-</span></p>
+                <p>更新次數：<span id="updateCount">0</span></p>
+                <p>目前數據：<span id="currentData">等待中...</span></p>
+            </div>
+        </div>
+
+        <!-- 5. 請求記錄 -->
+        <div class="section">
+            <h2>5️⃣ 請求記錄</h2>
+            <p>以下顯示所有的 API 請求記錄</p>
+            <button id="clearLog">清除記錄</button>
+            <div class="result" id="requestLog">
+                <p style="color: #999;">尚無請求記錄</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模擬的 API 資料
+        const mockData = {
+            users: [
+                { id: 1, name: '張三', email: 'zhang@example.com', role: 'admin' },
+                { id: 2, name: '李四', email: 'li@example.com', role: 'user' },
+                { id: 3, name: '王五', email: 'wang@example.com', role: 'user' }
+            ],
+            products: [
+                { id: 1, name: 'Playwright 教學書', price: 599, stock: 50 },
+                { id: 2, name: 'Python 自動化工具', price: 799, stock: 30 },
+                { id: 3, name: '網頁爬蟲實戰', price: 499, stock: 100 },
+                { id: 4, name: 'JavaScript 進階指南', price: 699, stock: 45 }
+            ]
+        };
+
+        // 請求記錄
+        const requestLog = [];
+
+        function logRequest(method, endpoint, status, response) {
+            const logEntry = {
+                time: new Date().toLocaleTimeString(),
+                method: method,
+                endpoint: endpoint,
+                status: status,
+                response: typeof response === 'object' ? JSON.stringify(response) : response
+            };
+            requestLog.push(logEntry);
+            updateLogDisplay();
+        }
+
+        function updateLogDisplay() {
+            const logDiv = document.getElementById('requestLog');
+            if (requestLog.length === 0) {
+                logDiv.innerHTML = '<p style="color: #999;">尚無請求記錄</p>';
+                return;
+            }
+
+            let html = '';
+            requestLog.slice(-5).reverse().forEach(log => {
+                const statusClass = log.status === 200 ? 'status-success' : 'status-error';
+                html += `
+                    <div class="data-item">
+                        <div>
+                            <strong>[${log.time}]</strong> ${log.method} 
+                            <span class="api-endpoint">${log.endpoint}</span>
+                        </div>
+                        <span class="status-badge ${statusClass}">${log.status}</span>
+                    </div>
+                `;
+            });
+            logDiv.innerHTML = html;
+        }
+
+        // 1. 取得用戶資料
+        document.getElementById('fetchUsers').addEventListener('click', function() {
+            const loading = document.getElementById('loading1');
+            const result = document.getElementById('usersResult');
+            
+            loading.classList.add('show');
+            result.innerHTML = '';
+
+            // 模擬 API 延遲
+            setTimeout(() => {
+                loading.classList.remove('show');
+                
+                let html = '<strong>API 回應：</strong><br>';
+                mockData.users.forEach(user => {
+                    html += `
+                        <div class="data-item">
+                            <div>
+                                <strong>${user.name}</strong> (${user.email})
+                            </div>
+                            <span class="status-badge ${user.role === 'admin' ? 'status-pending' : 'status-success'}">
+                                ${user.role}
+                            </span>
+                        </div>
+                    `;
+                });
+                result.innerHTML = html;
+
+                // 記錄請求
+                logRequest('GET', '/api/users', 200, mockData.users);
+            }, 1000);
+        });
+
+        // 2. 取得商品列表
+        document.getElementById('fetchProducts').addEventListener('click', function() {
+            const loading = document.getElementById('loading2');
+            const result = document.getElementById('productsResult');
+            
+            loading.classList.add('show');
+            result.innerHTML = '';
+
+            setTimeout(() => {
+                loading.classList.remove('show');
+                
+                let html = '<strong>API 回應：</strong><br>';
+                mockData.products.forEach(product => {
+                    html += `
+                        <div class="data-item">
+                            <div>
+                                <strong>${product.name}</strong> - 庫存: ${product.stock}
+                            </div>
+                            <span class="price">$${product.price}</span>
+                        </div>
+                    `;
+                });
+                result.innerHTML = html;
+
+                logRequest('GET', '/api/products', 200, mockData.products);
+            }, 1200);
+        });
+
+        // 3. POST 請求
+        document.getElementById('submitData').addEventListener('click', function() {
+            const loading = document.getElementById('loading3');
+            const result = document.getElementById('submitResult');
+            const input = document.getElementById('submitInput').value;
+            
+            if (!input.trim()) {
+                result.innerHTML = '<span style="color: #e74c3c;">請輸入內容</span>';
+                return;
+            }
+
+            loading.classList.add('show');
+
+            setTimeout(() => {
+                loading.classList.remove('show');
+                
+                const response = {
+                    success: true,
+                    message: '資料已成功提交',
+                    data: { content: input, timestamp: new Date().toISOString() }
+                };
+
+                result.innerHTML = `
+                    <strong>POST 回應：</strong>
+                    <pre>${JSON.stringify(response, null, 2)}</pre>
+                `;
+
+                logRequest('POST', '/api/submit', 200, response);
+            }, 800);
+        });
+
+        // 4. 即時更新
+        let pollingInterval = null;
+        let updateCount = 0;
+
+        document.getElementById('startPolling').addEventListener('click', function() {
+            this.disabled = true;
+            document.getElementById('stopPolling').disabled = false;
+            document.getElementById('loading4').classList.add('show');
+            
+            updateCount = 0;
+
+            pollingInterval = setInterval(() => {
+                updateCount++;
+                const randomValue = Math.floor(Math.random() * 1000);
+                
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+                document.getElementById('updateCount').textContent = updateCount;
+                document.getElementById('currentData').textContent = `隨機數值: ${randomValue}`;
+
+                logRequest('GET', '/api/realtime', 200, { value: randomValue });
+            }, 2000);
+        });
+
+        document.getElementById('stopPolling').addEventListener('click', function() {
+            this.disabled = true;
+            document.getElementById('startPolling').disabled = false;
+            document.getElementById('loading4').classList.remove('show');
+            
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            }
+        });
+
+        // 清除記錄
+        document.getElementById('clearLog').addEventListener('click', function() {
+            requestLog.length = 0;
+            updateLogDisplay();
+        });
+    </script>
+</body>
+</html>

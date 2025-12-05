@@ -2,6 +2,25 @@
 
 學習如何處理需要登入的網站和管理 Cookie。
 
+## 📁 本章檔案
+
+- **[`login_example.py`](./login_example.py)** - 登入與 Cookie 處理範例程式
+- **[`login_demo.html`](./login_demo.html)** - 登入功能測試頁面
+- **`README.md`** - 本章教學文件
+
+## 🚀 快速開始
+
+```bash
+# 執行示範程式
+python login_example.py
+```
+
+程式會自動開啟 `login_demo.html` 並展示登入、Cookie 儲存和載入的功能。Cookie 和瀏覽器狀態會儲存在 `output/` 目錄中。
+
+**測試帳號：**
+- 用戶名：`admin`
+- 密碼：`password123`
+
 ## 10.1 自動登入
 
 ### 填寫登入表單

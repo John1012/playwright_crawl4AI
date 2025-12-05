@@ -2,6 +2,25 @@
 
 了解常見的反爬蟲機制並學習應對策略。
 
+## 📁 本章檔案
+
+- **[`anti_detection_example.py`](./anti_detection_example.py)** - 反爬蟲對策範例程式
+- **[`anti_detection_demo.html`](./anti_detection_demo.html)** - 反爬蟲檢測測試頁面
+- **`README.md`** - 本章教學文件
+
+## 🚀 快速開始
+
+```bash
+# 執行示範程式
+python anti_detection_example.py
+```
+
+程式會自動開啟 `anti_detection_demo.html` 並展示：
+- 瀏覽器指紋檢測
+- 模擬人類行為（滑鼠移動、滾動、點擊）
+- 隱藏自動化特徵
+- User-Agent 輪換策略
+
 ## 11.1 常見的反爬蟲機制
 
 ### User-Agent 檢測
