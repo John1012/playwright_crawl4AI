@@ -297,7 +297,8 @@ async def tutorial_extraction():
         config = CrawlerRunConfig(
             word_count_threshold=1,
             user_agent="Mozilla/5.0 (compatible; NewsBot/1.0)",
-            cache_mode=CacheMode.BYPASS
+            cache_mode=CacheMode.BYPASS,
+            extraction_strategy=strategy
         )
         
         # 執行爬取
@@ -305,7 +306,6 @@ async def tutorial_extraction():
             print("\n🔍 開始提取資料...")
             result = await crawler.arun(
                 url=f"raw://{news_html}",
-                extraction_strategy=strategy,
                 config=config
             )
             
