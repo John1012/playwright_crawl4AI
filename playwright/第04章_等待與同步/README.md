@@ -191,8 +191,8 @@ page.wait_for_function("count => document.querySelectorAll('.item').length >= co
 本章提供了完整的互動式示範：
 
 ### 檔案說明
-- `waiting_demo.html` - 互動式示範頁面，包含 6 種等待情境
-- `index.py` - 完整的 Python 腳本，展示所有等待策略
+- **[`waiting_demo.html`](./waiting_demo.html)** - 互動式示範頁面，包含 6 種等待情境
+- **[`index.py`](./index.py)** - 完整的 Python 腳本，展示所有等待策略
 
 ### 執行方式
 

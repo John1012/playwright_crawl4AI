@@ -157,8 +157,8 @@ if not page.is_checked("input#agree"):
 ## 完整範例
 
 本章提供了完整的測試範例：
-- **index.py** - 表單自動化測試程式
-- **form_demo.html** - 測試用的表單頁面
+- **[index.py](./index.py)** - 表單自動化測試程式
+- **[form_demo.html](./form_demo.html)** - 測試用的表單頁面
 
 執行範例：
 ```bash

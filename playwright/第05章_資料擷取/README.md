@@ -225,8 +225,8 @@ if __name__ == "__main__":
 
 本章提供完整的本地測試環境：
 
-- `news_sample.html` - 新聞網站範例頁面
-- `scrape_news.py` - 新聞爬蟲程式
+- **[`news_sample.html`](./news_sample.html)** - 新聞網站範例頁面
+- **[`scrape_news.py`](./scrape_news.py)** - 新聞爬蟲程式
 
 ### 執行方式
 

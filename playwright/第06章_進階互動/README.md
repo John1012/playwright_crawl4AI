@@ -2,6 +2,21 @@
 
 學習更複雜的使用者互動操作。
 
+## 📁 本章檔案
+
+- **[`interactive_example.py`](./interactive_example.py)** - 進階互動範例程式
+- **[`interactive_demo.html`](./interactive_demo.html)** - 互動功能測試頁面
+- **`README.md`** - 本章教學文件
+
+## 🚀 快速開始
+
+```bash
+# 執行示範程式
+python interactive_example.py
+```
+
+程式會自動開啟 `interactive_demo.html` 並展示各種進階互動操作。
+
 ## 6.1 滑鼠操作
 
 ### 懸停（hover）
