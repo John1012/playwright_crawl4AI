@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>截圖與錄影示範頁面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        header h1 {
+            color: #f5576c;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .content-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .content-section h2 {
+            color: #f093fb;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f093fb;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .highlight-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            min-width: 150px;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .gallery-item {
+            background: #ddd;
+            height: 120px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 2em;
+        }
+
+        footer {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        footer p {
+            color: #999;
+        }
+
+        .action-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .action-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        #elementToCapture {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        #elementToCapture h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📸 截圖與錄影示範</h1>
+            <p>這個頁面用於測試 Playwright 的截圖和錄影功能</p>
+        </header>
+
+        <div class="content-section">
+            <h2>🎯 功能卡片</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">📷</div>
+                    <h3>全頁截圖</h3>
+                    <p>擷取完整頁面畫面</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🎬</div>
+                    <h3>操作錄影</h3>
+                    <p>錄製自動化過程</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📄</div>
+                    <h3>PDF 輸出</h3>
+                    <p>將頁面轉為 PDF</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🖼️</div>
+                    <h3>元素截圖</h3>
+                    <p>擷取特定元素</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>📊 統計數據</h2>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-number">1,234</div>
+                    <div class="stat-label">訪問次數</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">567</div>
+                    <div class="stat-label">用戶數量</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">89%</div>
+                    <div class="stat-label">滿意度</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">42</div>
+                    <div class="stat-label">功能模組</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="elementToCapture">
+            <h3>🎯 這是要被截圖的特定元素</h3>
+            <p>Playwright 可以只截取這個區塊，而不是整個頁面</p>
+        </div>
+
+        <div class="content-section">
+            <h2>📸 圖片展示區</h2>
+            <div class="image-gallery">
+                <div class="gallery-item">🌄</div>
+                <div class="gallery-item">🏞️</div>
+                <div class="gallery-item">🌅</div>
+                <div class="gallery-item">🌆</div>
+                <div class="gallery-item">🌃</div>
+                <div class="gallery-item">🌁</div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>📝 互動區域</h2>
+            <div class="highlight-box">
+                <strong>提示：</strong>這個頁面包含多種元素，適合用來測試不同類型的截圖。
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="action-button" id="actionBtn1">點擊動作 1</button>
+                <button class="action-button" id="actionBtn2">點擊動作 2</button>
+            </div>
+            <div id="actionResult" style="text-align: center; margin-top: 15px; color: #666;"></div>
+        </div>
+
+        <footer>
+            <p>Playwright 截圖與錄影示範頁面 © 2024</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('actionBtn1').addEventListener('click', function() {
+            document.getElementById('actionResult').innerHTML = 
+                '✅ 動作 1 已執行！時間：' + new Date().toLocaleTimeString();
+        });
+
+        document.getElementById('actionBtn2').addEventListener('click', function() {
+            document.getElementById('actionResult').innerHTML = 
+                '✅ 動作 2 已執行！時間：' + new Date().toLocaleTimeString();
+        });
+    </script>
+</body>
+</html>

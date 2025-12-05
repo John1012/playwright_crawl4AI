@@ -2,6 +2,22 @@
 
 處理多個分頁、彈出視窗和 iframe。
 
+## 📁 本章檔案
+
+- **[`multipage_example.py`](./multipage_example.py)** - 多頁面與框架處理範例程式
+- **[`multipage_demo.html`](./multipage_demo.html)** - 多頁面功能示範頁面
+- **[`iframe_content.html`](./iframe_content.html)** - iframe 內嵌頁面
+- **`README.md`** - 本章教學文件
+
+## 🚀 快速開始
+
+```bash
+# 執行示範程式
+python multipage_example.py
+```
+
+程式會自動開啟 `multipage_demo.html` 並展示多頁面、對話框和 iframe 的處理方式。
+
 ## 7.1 處理多個分頁
 
 ### 開啟新分頁

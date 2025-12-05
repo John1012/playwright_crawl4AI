@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>效能優化測試頁面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #11998e;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+
+        .section h2 {
+            color: #38ef7d;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .image-item {
+            background: #ddd;
+            height: 120px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            transition: transform 0.3s;
+        }
+
+        .image-item:hover {
+            transform: scale(1.05);
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .data-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .data-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            transform: translateY(-3px);
+        }
+
+        .data-card h3 {
+            color: #11998e;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .data-card p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .data-card .price {
+            color: #e74c3c;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(17, 153, 142, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            color: #11998e;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .loading.show {
+            display: block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .performance-stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .resource-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .resource-list li {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .resource-list li:last-child {
+            border-bottom: none;
+        }
+
+        .resource-size {
+            background: #e8f4f8;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #11998e;
+        }
+
+        .tips-box {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .tips-box h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .tips-box ul {
+            padding-left: 20px;
+        }
+
+        .tips-box li {
+            margin: 10px 0;
+            color: #555;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .page-btn {
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .page-btn:hover {
+            background: #11998e;
+            color: white;
+        }
+
+        .page-btn.active {
+            background: #11998e;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ 效能優化測試頁面</h1>
+
+        <div class="performance-stats">
+            <h3>📊 頁面效能統計</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="loadTime">--</div>
+                    <div class="stat-label">載入時間 (ms)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="resourceCount">--</div>
+                    <div class="stat-label">資源數量</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="dataCount">--</div>
+                    <div class="stat-label">資料項目</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="domNodes">--</div>
+                    <div class="stat-label">DOM 節點</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>1️⃣ 圖片資源（可阻擋以提升速度）</h2>
+            <p>以下是模擬的圖片元素，阻擋圖片載入可以顯著提升爬蟲速度。</p>
+            <div class="image-gallery">
+                <div class="image-item">🖼️</div>
+                <div class="image-item">🌄</div>
+                <div class="image-item">🏞️</div>
+                <div class="image-item">🌅</div>
+                <div class="image-item">🌆</div>
+                <div class="image-item">🌃</div>
+                <div class="image-item">🌁</div>
+                <div class="image-item">🏔️</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2️⃣ 動態載入資料</h2>
+            <p>模擬 AJAX 載入的商品資料，適合測試平行處理。</p>
+            <button id="loadData">載入商品資料</button>
+            <button id="loadMore" disabled>載入更多</button>
+            <div class="loading" id="loading1">正在載入資料...</div>
+            <div class="data-grid" id="dataContainer"></div>
+            <div class="pagination" id="pagination" style="display: none;">
+                <button class="page-btn active" data-page="1">1</button>
+                <button class="page-btn" data-page="2">2</button>
+                <button class="page-btn" data-page="3">3</button>
+                <button class="page-btn" data-page="4">4</button>
+                <button class="page-btn" data-page="5">5</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>3️⃣ 資源載入清單</h2>
+            <p>以下是頁面載入的資源（模擬），實際爬蟲可以選擇性阻擋。</p>
+            <ul class="resource-list">
+                <li>
+                    <span>📄 main.css (樣式表)</span>
+                    <span class="resource-size">45 KB</span>
+                </li>
+                <li>
+                    <span>📜 app.js (JavaScript)</span>
+                    <span class="resource-size">120 KB</span>
+                </li>
+                <li>
+                    <span>🖼️ banner.jpg (圖片)</span>
+                    <span class="resource-size">350 KB</span>
+                </li>
+                <li>
+                    <span>🔤 font.woff2 (字體)</span>
+                    <span class="resource-size">80 KB</span>
+                </li>
+                <li>
+                    <span>🎬 video.mp4 (影片)</span>
+                    <span class="resource-size">2.5 MB</span>
+                </li>
+                <li>
+                    <span>📊 analytics.js (追蹤)</span>
+                    <span class="resource-size">30 KB</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>4️⃣ 批次處理測試</h2>
+            <p>模擬需要批次處理的多個項目。</p>
+            <button id="batchProcess">開始批次處理</button>
+            <div class="loading" id="loading2">正在處理...</div>
+            <div id="batchResult"></div>
+        </div>
+
+        <div class="tips-box">
+            <h3>💡 效能優化技巧</h3>
+            <ul>
+                <li><strong>阻擋不必要的資源：</strong>圖片、字體、樣式表、影片</li>
+                <li><strong>使用 headless 模式：</strong>無頭瀏覽器執行速度更快</li>
+                <li><strong>平行處理：</strong>使用多個瀏覽器上下文同時爬取</li>
+                <li><strong>批次處理：</strong>將 URL 分組處理，控制並發數量</li>
+                <li><strong>使用 domcontentloaded：</strong>不需等待完整頁面載入</li>
+                <li><strong>及時釋放資源：</strong>關閉不需要的頁面和上下文</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 模擬商品資料
+        const allProducts = [];
+        for (let i = 1; i <= 50; i++) {
+            allProducts.push({
+                id: i,
+                name: `商品 ${i}`,
+                description: `這是商品 ${i} 的描述，包含詳細的產品資訊。`,
+                price: Math.floor(Math.random() * 900) + 100
+            });
+        }
+
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        // 載入資料
+        function loadProducts(page) {
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const products = allProducts.slice(start, end);
+            
+            const container = document.getElementById('dataContainer');
+            container.innerHTML = '';
+            
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'data-card';
+                card.innerHTML = `
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <div class="price">$${product.price}</div>
+                `;
+                container.appendChild(card);
+            });
+            
+            document.getElementById('dataCount').textContent = products.length;
+        }
+
+        // 載入資料按鈕
+        document.getElementById('loadData').addEventListener('click', function() {
+            const loading = document.getElementById('loading1');
+            loading.classList.add('show');
+            
+            setTimeout(() => {
+                loading.classList.remove('show');
+                loadProducts(1);
+                document.getElementById('loadMore').disabled = false;
+                document.getElementById('pagination').style.display = 'flex';
+            }, 800);
+        });
+
+        // 載入更多按鈕
+        document.getElementById('loadMore').addEventListener('click', function() {
+            const loading = document.getElementById('loading1');
+            loading.classList.add('show');
+            
+            currentPage++;
+            if (currentPage > 5) currentPage = 1;
+            
+            setTimeout(() => {
+                loading.classList.remove('show');
+                loadProducts(currentPage);
+                
+                // 更新分頁按鈕狀態
+                document.querySelectorAll('.page-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (parseInt(btn.dataset.page) === currentPage) {
+                        btn.classList.add('active');
+                    }
+                });
+            }, 500);
+        });
+
+        // 分頁按鈕
+        document.querySelectorAll('.page-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const page = parseInt(this.dataset.page);
+                currentPage = page;
+                
+                document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                loadProducts(page);
+            });
+        });
+
+        // 批次處理
+        document.getElementById('batchProcess').addEventListener('click', function() {
+            const loading = document.getElementById('loading2');
+            const result = document.getElementById('batchResult');
+            loading.classList.add('show');
+            result.innerHTML = '';
+            
+            let processed = 0;
+            const total = 10;
+            
+            const interval = setInterval(() => {
+                processed++;
+                result.innerHTML = `<p>已處理：${processed}/${total} 項目</p>`;
+                
+                if (processed >= total) {
+                    clearInterval(interval);
+                    loading.classList.remove('show');
+                    result.innerHTML += `<p style="color: #11998e; font-weight: bold;">✅ 批次處理完成！</p>`;
+                }
+            }, 300);
+        });
+
+        // 計算效能統計
+        window.addEventListener('load', function() {
+            // 載入時間
+            const loadTime = Math.round(performance.now());
+            document.getElementById('loadTime').textContent = loadTime;
+            
+            // 資源數量（模擬）
+            document.getElementById('resourceCount').textContent = 6;
+            
+            // DOM 節點數量
+            const domNodes = document.getElementsByTagName('*').length;
+            document.getElementById('domNodes').textContent = domNodes;
+            
+            // 初始資料數量
+            document.getElementById('dataCount').textContent = 0;
+        });
+    </script>
+</body>
+</html>

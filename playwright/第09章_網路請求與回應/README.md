@@ -2,6 +2,21 @@
 
 學習如何攔截、監聽和修改網路請求。
 
+## 📁 本章檔案
+
+- **[`network_example.py`](./network_example.py)** - 網路請求監聽與攔截範例程式
+- **[`network_demo.html`](./network_demo.html)** - 網路請求模擬頁面
+- **`README.md`** - 本章教學文件
+
+## 🚀 快速開始
+
+```bash
+# 執行示範程式
+python network_example.py
+```
+
+程式會自動開啟 `network_demo.html` 並展示網路請求監聽、攔截和修改的功能。
+
 ## 9.1 監聽網路請求
 
 ### 攔截 API 請求

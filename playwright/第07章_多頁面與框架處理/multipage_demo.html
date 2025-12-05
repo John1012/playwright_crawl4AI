@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多頁面與框架處理示範</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+
+        .section h2 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            min-height: 50px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 200px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .popup-info {
+            background: #e8f4f8;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .tab-item {
+            padding: 10px 20px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-item:hover:not(.active) {
+            background: #d0d0d0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🪟 多頁面與框架處理示範</h1>
+
+        <!-- 1. 彈出視窗示範 -->
+        <div class="section">
+            <h2>1️⃣ 彈出視窗 (Popup)</h2>
+            <p>點擊按鈕會開啟新的彈出視窗。</p>
+            <button id="openPopup">開啟新視窗</button>
+            <button id="openBlankLink">
+                <a href="popup_page.html" target="_blank" style="color: white; text-decoration: none;">在新分頁開啟連結</a>
+            </button>
+            <div class="result" id="popupResult">
+                等待操作...
+            </div>
+        </div>
+
+        <!-- 2. 對話框示範 -->
+        <div class="section">
+            <h2>2️⃣ 對話框 (Dialog)</h2>
+            <p>測試 alert、confirm、prompt 對話框。</p>
+            <button id="showAlert">顯示 Alert</button>
+            <button id="showConfirm">顯示 Confirm</button>
+            <button id="showPrompt">顯示 Prompt</button>
+            <div class="result" id="dialogResult">
+                等待操作...
+            </div>
+        </div>
+
+        <!-- 3. iframe 示範 -->
+        <div class="section">
+            <h2>3️⃣ iframe 框架</h2>
+            <p>在 iframe 中操作元素。</p>
+            <iframe id="myFrame" name="demo-frame" src="iframe_content.html"></iframe>
+            <div class="result" id="iframeResult">
+                等待 iframe 內的操作...
+            </div>
+        </div>
+
+        <!-- 4. 多分頁模擬 -->
+        <div class="section">
+            <h2>4️⃣ 多分頁模擬</h2>
+            <p>模擬在多個分頁之間切換的場景。</p>
+            <div class="tab-container">
+                <div class="tab-item active" data-tab="tab1">分頁 1</div>
+                <div class="tab-item" data-tab="tab2">分頁 2</div>
+                <div class="tab-item" data-tab="tab3">分頁 3</div>
+            </div>
+            <div class="result" id="tabContent">
+                <strong>分頁 1 內容：</strong>這是第一個分頁的內容
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. 彈出視窗
+        document.getElementById('openPopup').addEventListener('click', function() {
+            const popup = window.open('', 'popup', 'width=400,height=300');
+            popup.document.write(`
+                <html>
+                <head><title>彈出視窗</title></head>
+                <body style="font-family: Arial; padding: 20px; text-align: center;">
+                    <h2>🎉 這是彈出視窗</h2>
+                    <p>Playwright 可以捕捉並操作這個視窗</p>
+                    <button onclick="window.close()">關閉視窗</button>
+                </body>
+                </html>
+            `);
+            document.getElementById('popupResult').innerHTML = 
+                '<strong>✓ 已開啟彈出視窗</strong> - 時間：' + new Date().toLocaleTimeString();
+        });
+
+        // 2. 對話框
+        document.getElementById('showAlert').addEventListener('click', function() {
+            alert('這是一個 Alert 對話框！');
+            document.getElementById('dialogResult').innerHTML = 
+                '<strong>✓ Alert 已顯示並關閉</strong>';
+        });
+
+        document.getElementById('showConfirm').addEventListener('click', function() {
+            const result = confirm('這是一個 Confirm 對話框。\n你確定要繼續嗎？');
+            document.getElementById('dialogResult').innerHTML = 
+                '<strong>✓ Confirm 結果：</strong>' + (result ? '確認' : '取消');
+        });
+
+        document.getElementById('showPrompt').addEventListener('click', function() {
+            const result = prompt('請輸入你的名字：', '預設值');
+            document.getElementById('dialogResult').innerHTML = 
+                '<strong>✓ Prompt 輸入：</strong>' + (result || '(已取消)');
+        });
+
+        // 3. 監聽來自 iframe 的訊息
+        window.addEventListener('message', function(event) {
+            document.getElementById('iframeResult').innerHTML = 
+                '<strong>✓ 收到 iframe 訊息：</strong>' + event.data;
+        });
+
+        // 4. 多分頁切換
+        const tabContents = {
+            tab1: '<strong>分頁 1 內容：</strong>這是第一個分頁的內容',
+            tab2: '<strong>分頁 2 內容：</strong>這是第二個分頁的內容，包含不同的資料',
+            tab3: '<strong>分頁 3 內容：</strong>這是第三個分頁的內容，展示更多資訊'
+        };
+
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // 移除所有 active
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                // 添加當前 active
+                this.classList.add('active');
+                // 更新內容
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById('tabContent').innerHTML = tabContents[tabId];
+            });
+        });
+    </script>
+</body>
+</html>

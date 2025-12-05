@@ -2,6 +2,21 @@
 
 學習如何擷取網頁畫面和錄製操作過程。
 
+## 📁 本章檔案
+
+- **[`screenshot_example.py`](./screenshot_example.py)** - 截圖與錄影範例程式
+- **[`screenshot_demo.html`](./screenshot_demo.html)** - 截圖測試頁面
+- **`README.md`** - 本章教學文件
+
+## 🚀 快速開始
+
+```bash
+# 執行示範程式
+python screenshot_example.py
+```
+
+程式會自動開啟 `screenshot_demo.html` 並展示各種截圖和錄影功能。截圖檔案將儲存於 `output/` 目錄中。
+
 ## 8.1 頁面截圖
 
 ### 全頁面截圖
