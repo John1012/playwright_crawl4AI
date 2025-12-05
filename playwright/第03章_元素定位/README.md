@@ -4,8 +4,8 @@
 
 ## 📁 本章檔案
 
-- **`index.py`** - 元素定位示範程式（建議先執行這個）
-- **`login_demo.html`** - 練習用的登入頁面
+- **[`index.py`](./index.py)** - 元素定位示範程式（建議先執行這個）
+- **[`login_demo.html`](./login_demo.html)** - 練習用的登入頁面
 - **`README.md`** - 本章教學文件
 
 ## 🚀 快速開始
