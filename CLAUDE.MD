@@ -38,13 +38,17 @@ playwright_crawl4AI/
 │   ├── 安裝/
 │   ├── 初體驗/
 │   ├── Crawl4A快速入門/
+│   │   └── 手動方式產生css_schema/
 │   ├── Crawl4A操控javascript/
 │   ├── Crawl4A多頁面爬蟲/
 │   ├── asyncio套件教學/
 │   ├── 排程/
+│   ├── docker/          # Docker configuration
+│   ├── .gemini/         # Gemini AI integration
 │   └── 實際案例/
 │       ├── 1台灣銀行牌告匯率/
 │       ├── 2台灣即時股票資訊/
+│       ├── 3台灣即時股票資訊_tkinter/
 │       └── 4台灣即時股票資訊_tkinter/
 │
 ├── list/                # Additional resources
@@ -73,7 +77,9 @@ playwright_crawl4AI/
 
 ### Supporting Libraries
 - **asyncio**: For asynchronous programming
+- **nest-asyncio**: Enables nested event loops (useful in Jupyter notebooks)
 - **Tkinter**: GUI applications (in some examples)
+- **ipykernel**: Jupyter notebook support
 
 ## Learning Path
 
@@ -114,8 +120,8 @@ The recommended learning sequence is:
 ## Development Environment
 
 ### Python Version
-- Minimum: Python 3.8
-- Recommended: Python 3.10+
+- Minimum: Python 3.11 (as specified in pyproject.toml)
+- Recommended: Python 3.11+
 - Current: Using `.python-version` file
 
 ### Package Management
@@ -129,12 +135,19 @@ The recommended learning sequence is:
 
 ### Installation
 ```bash
-# Install Playwright
+# Using uv (recommended)
+uv sync
+
+# Or using pip
 pip install playwright
 playwright install  # Downloads browser binaries (important!)
 
-# Install Crawl4AI
 pip install crawl4ai
+pip install nest-asyncio ipykernel
+
+# Verify installations
+playwright --version
+python -c "import crawl4ai; print(crawl4ai.__version__)"
 ```
 
 ## Key Differences: Playwright vs Crawl4AI
@@ -167,10 +180,15 @@ Both are valid for scraping - Playwright gives control, Crawl4AI gives productiv
 - **Type**: Dynamic web scraping (JavaScript rendering)
 - **Good for**: Intermediate learners
 
-### 3. Stock Info with Tkinter GUI
-- **Location**: `crawl4AI/實際案例/4台灣即時股票資訊_tkinter/`
+### 3. Stock Info with Tkinter GUI (Version 1)
+- **Location**: `crawl4AI/實際案例/3台灣即時股票資訊_tkinter/`
 - **Type**: Full application with GUI and auto-refresh
 - **Good for**: Complete project reference
+
+### 4. Stock Info with Tkinter GUI (Version 2)
+- **Location**: `crawl4AI/實際案例/4台灣即時股票資訊_tkinter/`
+- **Type**: Enhanced version with improved UI
+- **Good for**: Advanced GUI implementation
 
 ## Common Patterns
 
@@ -248,3 +266,48 @@ This is an educational resource emphasizing:
 2. **Practical application** - Real-world examples
 3. **Progressive learning** - Build on previous knowledge
 4. **Modern techniques** - Async, AI-powered scraping
+
+## Advanced Features
+
+### Docker Support
+The project includes Docker configuration in `crawl4AI/docker/` for containerized deployment.
+
+### Gemini AI Integration
+Found in `crawl4AI/.gemini/` - demonstrates integration with Google's Gemini AI for enhanced content extraction.
+
+### CSS Schema Manual Creation
+See `crawl4AI/Crawl4A快速入門/手動方式產生css_schema/` for detailed examples of manually crafting CSS schemas for precise data extraction.
+
+### Multi-page Scraping Techniques
+The `Crawl4A多頁面爬蟲/` section covers:
+- Loop-based approaches (`lesson1_爬取台灣即時股票資訊_loop方式.py`)
+- Different schema strategies (`lesson2_爬取台灣即時股票資訊_不同的schema.py`)
+- Batch processing with `arun_many` (`lesson3_爬取台灣即時股票資訊_arun_many.py`)
+
+### Scheduling
+The `排程/` directory demonstrates automated scraping with async scheduling for continuous data collection.
+
+## Troubleshooting
+
+### Common Issues
+1. **Browser not installed**: Run `playwright install` after installing Playwright
+2. **Import errors**: Ensure virtual environment is activated
+3. **Async errors in Jupyter**: Use `nest-asyncio` to enable nested event loops
+4. **Permission denied**: Check file permissions in project directory
+5. **Rate limiting**: Implement delays and respect robots.txt (covered in Chapter 11)
+
+### Dependencies
+Current versions (from pyproject.toml):
+- crawl4ai >= 0.7.7
+- playwright >= 1.55.0
+- ipykernel >= 7.1.0
+- nest-asyncio >= 1.6.0
+
+## Git Worktree Information
+This project uses git worktrees for branch isolation:
+- **Worktree location**: `/Users/roberthsu2003/.claude-worktrees/playwright_crawl4AI/romantic-chaum`
+- **Main repository**: `/Users/roberthsu2003/Documents/GitHub/playwright_crawl4AI`
+- **Current branch**: `romantic-chaum`
+- **Main branch**: `main`
+
+When making changes, commits are isolated to the current worktree branch.
