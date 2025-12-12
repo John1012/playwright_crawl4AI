@@ -6,6 +6,8 @@
 
 **目標網站**: [台灣銀行牌告匯率](https://rate.bot.com.tw/xrt?Lang=zh-TW)
 
+**主程式-main.py**:[main.py](./main.py)
+
 ## 功能特色
 
 - ✅ 自動化擷取台灣銀行牌告匯率
