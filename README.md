@@ -38,6 +38,12 @@ playwright install  # ⚠️ 重要：下載瀏覽器驅動
 
 # 2. 安裝 Crawl4AI
 pip install crawl4ai
+
+# 3. Run post-installation setup
+crawl4ai-setup
+
+# 4.Verify your installation
+crawl4ai-doctor
 ```
 
 詳細安裝說明：
