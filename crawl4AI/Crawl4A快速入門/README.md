@@ -781,7 +781,7 @@ html = """
 
 ---
 
-## 5.4 使用 LLM 提示詞引導擷取
+## 5.4 使用 LLM 提示詞引導擷取(目前測試效果不好)
 
 前面的方法都是使用 `JsonCssExtractionStrategy`（基於 CSS 選擇器），但有時候網頁結構非常複雜、不規則，或者需要 AI 理解語義內容時，可以使用 `LLMExtractionStrategy`，讓 LLM **每次執行時**根據自訂提示詞來擷取資料。
 
@@ -869,7 +869,7 @@ async def main():
 
     # 建立 LLM 擷取策略
     strategy = LLMExtractionStrategy(
-        provider="ollama/llama3.2",
+        llm_config=LLMConfig(provider="ollama/gpt-oss:20b"),
         api_token=None,
         instruction=custom_instruction  # 自訂提示詞
     )
