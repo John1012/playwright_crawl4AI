@@ -1,7 +1,7 @@
 # 手動方式產生css_schema
 
 [**官網說明文件**](https://docs.crawl4ai.com/extraction/no-llm-strategies/)
-
+[**css_schema教學**](./schema.md)
 提取JSON(無LLM)
 Crawl4AI 最強大的功能之一是無需依賴大型語言模型即可從網站中提取結構化 JSON。 
 
